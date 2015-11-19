@@ -57,8 +57,13 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 						}
 						
 						var filteredTorrents = response.list.filter(torrentInfo => {
-							var reg = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + ')', 'i');
-							return reg.test(torrentInfo.title.trim());
+							var title = torrentInfo.title.trim(),
+								regEpisode = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' +
+																		season + 'x' + episode + ')', 'i'),
+								regIgnoredWords = new RegExp(config.ignoredWords.join('|'), 'i');
+								
+							return regEpisode.test(title) &&
+									! regIgnoredWords.test(title);
 						});
 						
 						filteredTorrents.forEach(torrentInfo => {
