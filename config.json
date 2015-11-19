@@ -1,0 +1,6 @@
+{
+	"qualityMax": "1080p",
+	"ignoredWords": ["x265", "h265", "480p"],
+	"qualityOrder": ["1080p", "720p", "480p", "UNKNOWN"],
+	"distributionOrder": ["BLURAY", "WEB-DL", "HDTV", "SDTV", "UNKNOWN"]
+}
