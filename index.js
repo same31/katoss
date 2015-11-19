@@ -98,8 +98,8 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 											fs.writeFileSync(torrentFile.filename, torrentContent, 'binary');
 											
 											console.log(quality, distribution, lang);
-											console.log('Torrent:', torrents[quality][distribution][index].title);
-											console.log('Sub:', subs[lang][distribution][0].MovieReleaseName);
+											console.log(' Torrent:', torrents[quality][distribution][index].title);
+											console.log(' Sub:', subs[lang][distribution][0].MovieReleaseName);
 											
 											return true;
 										}

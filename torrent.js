@@ -21,10 +21,37 @@ function downloadTorrentFileContent(url) {
 	}).getBody('binary').toString();
 }
 
+function _getFileExtension(filename) {
+	return filename.substr((~-filename.lastIndexOf('.') >>> 0) + 2).toLowerCase();
+}
+
 function checkEpisodeTorrentContent(torrentContent) {
-	var torrentInfo = bencode.decode(torrentContent);
-	// Check...
-	return true;
+	var torrentInfo = bencode.decode(torrentContent),
+		files,
+		getFilePath;
+		
+	if (! torrentInfo.info || !torrentInfo.info.files) {
+		return false;
+	}
+	
+	files = torrentInfo.info.files.filter(file => {
+		return file.path && file.path.length > 0;
+	});
+	
+	getFilePath = file => {
+		return file.path[file.path.length - 1];
+	};
+	
+	if (files.some(file => {
+		return _getFileExtension(getFilePath(file)) === 'exe';
+	})) {
+		return false;
+	}
+	
+	return files.some(file => {
+		var extension = _getFileExtension(getFilePath(file));
+		return extension && ~['avi', 'mkv', 'mp4', 'mpg', 'mpeg'].indexOf(extension) && parseInt(file.length) > 0;
+	});
 }
 
 module.exports = {
