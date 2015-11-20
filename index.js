@@ -2,6 +2,7 @@ var search = require('./search.json'),
 	config = require('./config.json'),
 	Torrent = require('./torrent'),
 	fs = require('fs'),
+	zlib = require('zlib'),
 	xmlrpc = require('xmlrpc'),
 	client = xmlrpc.createClient({ host: 'api.opensubtitles.org', port: 80, path: '/xml-rpc'}),
 	kickass = require('kickass-torrent'),
@@ -16,7 +17,15 @@ function getDistribution (title) {
 		: 'UNKNOWN';
 }
 
+function releaseNameIsValid (releaseName, show, season, episode) {
+	var reg = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
+										parseInt(season) + 'x' + episode + '|' + season + 'x' + parseInt(episode) + '|' +
+										parseInt(season) + 'x' + parseInt(episode) + ')', 'i');
+	return reg.test(releaseName.trim());
+}
+
 // Login to opensubtitles api
+// --------------------------
 client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, response) {
 	if (err) {
 		return console.log('OpenSubtitles connection problem', err);
@@ -29,14 +38,15 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 		for (season in showInfo.Seasons) {
 			episodeList = showInfo.Seasons[season];
 			episodeList.forEach(episode => {
+				// Search available subtitles for TV show episode
+				// ----------------------------------------------
 				client.methodCall('SearchSubtitles', [token, [{'sublanguageid': showInfo.Languages.join(), 'query': show, 'season': season, 'episode': episode}]], function (err, response) {
 					if (err || ! response.data) {
 						return console.log('OpenSubtitles connection problem', err, response);
 					}
 					
 					var filteredSubs = response.data.filter(subInfo => {
-						var reg = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' + parseInt(season) + 'x' + episode + '|' + season + 'x' + parseInt(episode) + '|' + parseInt(season) + 'x' + parseInt(episode) + ')', 'i');
-						return reg.test(subInfo.MovieReleaseName.trim());
+						return releaseNameIsValid(subInfo.MovieReleaseName, show, season, episode);
 					}),
 						subs = {},
 						torrents = {};
@@ -53,17 +63,14 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 
 					kickass({q: show + ' S' + season + 'E' + episode}, function (err, response) {
 						if (err) {
-							return console.log('KickAss Torrent connection problem', err);
+							return console.log('KickAssTorrent connection problem', err);
 						}
 						
 						var filteredTorrents = response.list.filter(torrentInfo => {
 							var title = torrentInfo.title.trim(),
-								regEpisode = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' +
-																		season + 'x' + episode + ')', 'i'),
 								regIgnoredWords = new RegExp(config.ignoredWords.join('|'), 'i');
-								
-							return regEpisode.test(title) &&
-									! regIgnoredWords.test(title);
+							
+							return releaseNameIsValid(title, show, season, episode) && ! regIgnoredWords.test(title);
 						});
 						
 						filteredTorrents.forEach(torrentInfo => {
@@ -77,7 +84,7 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 							torrents[quality][distribution].push(torrentInfo);
 						});
 						
-						console.log("\n\n" + show, 'S' + season + 'E' + episode);
+						console.log(show, 'S' + season + 'E' + episode);
 						
 						var found = config.qualityOrder.some(quality => {
 							if (! torrents[quality]) {
@@ -98,13 +105,34 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 									
 									return eligibleTorrents.some((torrentInfo, index) => {
 										var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
-										torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url);
+										torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
+										episodeFilename,
+										subInfo;
 										if (Torrent.checkEpisodeTorrentContent(torrentContent)) {
-											fs.writeFileSync(torrentFile.filename, torrentContent, 'binary');
+											episodeFilename = Torrent.getEpisodeFilename(torrentContent);
 											
-											console.log(quality, distribution, lang);
+											fs.writeFile(torrentFile.filename, torrentContent, 'binary');
+											
+											subInfo = subs[lang][distribution][0];
+											
+											
+											console.log(' ' + quality, distribution, lang);
 											console.log(' Torrent:', torrents[quality][distribution][index].title);
-											console.log(' Sub:', subs[lang][distribution][0].MovieReleaseName);
+											console.log(' Episode filename:', episodeFilename);
+											console.log(' Sub:', subInfo.MovieReleaseName);
+											
+											client.methodCall('DownloadSubtitles', [token, [subInfo.IDSubtitleFile]], function (err, response) {
+												if (!response.data || !response.data[0] || !response.data[0].data) {
+													return console.log('Error while downloading subtitles');
+												}
+													
+												zlib.unzip(new Buffer(response.data[0].data, 'base64'), function(err, buffer) {
+													if (err) {
+													  return console.log('Error with subtitles unzip');
+													}
+													fs.writeFile(episodeFilename + '.' + lang.substr(0, 2) + '.srt', buffer);
+												});
+											});
 											
 											return true;
 										}
@@ -117,6 +145,7 @@ client.methodCall('LogIn', ['', '', 'fr', 'webcoreTv v1'], function (err, respon
 						if (! found) {
 							console.log('Not found.');
 						}
+						console.log("\n");
 					})
 				});
 			});
