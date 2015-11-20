@@ -22,6 +22,13 @@ module.exports = function(grunt) {
                 cwd : 'ui',
                 dest : '<%= dir.dist %>'
             }]
-        }
+        },
+        
+        html: {
+			files: [ {
+                src: 'ui/index.html',
+                dest: '<%= dir.dist %>/index.html'
+            } ]
+		}
     };
 };

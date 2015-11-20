@@ -6,7 +6,7 @@ var fs          = require('fs'),
 
 module.exports = {
     bsFiles: {
-        src: ['./dist/js/app.js'/*, './dist/css/app/blessed/*.css'*/]
+        src: ['./dist/index.html', './dist/js/app.js'/*, './dist/css/app/blessed/*.css'*/]
     },
     options: {
         notify:    true,
