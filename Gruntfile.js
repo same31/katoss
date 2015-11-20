@@ -16,5 +16,5 @@ module.exports = function (grunt) {
         data: config
     });
 
-    grunt.registerTask('default', ['clean:build', 'copy:all', 'browserSync', 'watch']);
+    grunt.registerTask('default', ['clean:build', 'copy:all', 'browserify:app', 'browserSync', 'watch']);
 };

@@ -1,1 +1,3 @@
-console.log('LOADED');
+var katoss = require('../../katoss/katoss');
+
+katoss();
