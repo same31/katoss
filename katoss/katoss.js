@@ -8,7 +8,7 @@ function getDistribution(title) {
 }
 
 function releaseNameIsValid(releaseName, show, season, episode) {
-    var reg = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
+    var reg = new RegExp('^' + show.replace(/ +/g, '.') + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
         parseInt(season) + 'x' + episode + '|' + season + 'x' + parseInt(episode) + '|' +
         parseInt(season) + 'x' + parseInt(episode) + ')', 'i');
     return reg.test(releaseName.trim());
