@@ -40,7 +40,7 @@ function getTorrentFiles(torrentContent) {
         return [];
     }
 
-    return torrentInfo.info.files.filter(file => {
+    return torrentInfo.info.files.filter(function (file) {
         return file.path && file.path.length > 0;
     });
 }
@@ -63,7 +63,7 @@ function checkEpisodeTorrentContent(torrentContent) {
 
     // Invalid if there is a .exe file
     // -------------------------------
-    if (files.some(file => {
+    if (files.some(function (file) {
             return getFileExtension(getTorrentFilesFilePath(file)) === 'exe';
         })) {
         return false;
@@ -71,7 +71,7 @@ function checkEpisodeTorrentContent(torrentContent) {
 
     // Valid if there is a movie file with length > 0
     // ----------------------------------------------
-    return files.some(file => {
+    return files.some(function (file) {
         var filename = getTorrentFilesFilePath(file);
         return fileExtensionIsMovie(filename) && parseInt(file.length) > 0;
     });
@@ -79,7 +79,7 @@ function checkEpisodeTorrentContent(torrentContent) {
 
 function getEpisodeFilename(torrentContent) {
     var files = getTorrentFiles(torrentContent);
-    return files.reduce((prevFile, file) => {
+    return files.reduce(function (prevFile, file) {
         var filename = getTorrentFilesFilePath(file),
             length = parseInt(file.length);
         if (fileExtensionIsMovie(filename) && length > prevFile.length) {
