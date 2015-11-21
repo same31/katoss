@@ -1,5 +1,5 @@
 module.exports = {
-    build : {
-        src : [ '<%= dir.dist %>' ]
-    },
+    build: {
+        src: ['<%= dir.dist %>']
+    }
 };

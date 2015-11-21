@@ -8,14 +8,14 @@ module.exports = {
             livereload: false
         },
         files: [/*'<%= files.resources.sass %>'*/],
-        tasks: [  ]
+        tasks: []
     },
-    
+
     html: {
-		options: {
+        options: {
             livereload: false
         },
         files: ['ui/index.html'],
-        tasks: [ 'copy:html' ]
-	}
+        tasks: ['copy:html']
+    }
 };

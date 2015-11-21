@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     var suffix = grunt.option('env') === 'prod' ? '.min' : '';
 
     return {
@@ -8,27 +8,27 @@ module.exports = function(grunt) {
         },
 
         all: {
-            files: [ {
+            files: [{
                 src: 'node_modules/js-polyfills/polyfill' + suffix + '.js',
                 dest: '<%= dir.dist %>/js/polyfill.js'
             },
-            {
-                src: 'node_modules/bootstrap/dist/css/bootstrap' + suffix + '.js',
-                dest: '<%= dir.dist %>/css/bootstrap.css'
-            },
-			{
-				src: '**/*',
-                expand : true,
-                cwd : 'ui',
-                dest : '<%= dir.dist %>'
-            }]
+                {
+                    src: 'node_modules/bootstrap/dist/css/bootstrap' + suffix + '.js',
+                    dest: '<%= dir.dist %>/css/bootstrap.css'
+                },
+                {
+                    src: '**/*',
+                    expand: true,
+                    cwd: 'ui',
+                    dest: '<%= dir.dist %>'
+                }]
         },
-        
+
         html: {
-			files: [ {
+            files: [{
                 src: 'ui/index.html',
                 dest: '<%= dir.dist %>/index.html'
-            } ]
-		}
+            }]
+        }
     };
 };
