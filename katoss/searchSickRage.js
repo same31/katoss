@@ -24,14 +24,20 @@ function sendAPICmd(cmd, params, callback) {
         if (err) {
             return console.log(err);
         }
-        callback(JSON.parse(body));
+        callback(JSON.parse(body).data);
     });
 }
 
 // Get show id list
 // ----------------
 sendAPICmd('shows', {'sort': 'name', 'pause': 0}, function (showList) {
-    console.log(showList);
+    for (var showName in showList) {
+        if (!showList.hasOwnProperty(showName)) {
+            continue;
+        }
+        var show = showList[showName];
+        sendAPICmd('show.seasons', {tvdbid: show.tvdbid}, function (seasons) {
+            console.log(seasons);
+        });
+    }
 });
-
-
