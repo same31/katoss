@@ -49,18 +49,18 @@ function katoss(searchJSON) {
                         continue;
                     }
                     episodeList = showInfo.seasons[season];
-                    episodeList.forEach(episode => {
+                    episodeList.forEach(function (episode) {
                         // Search available subtitles for TV show episode
                         // ----------------------------------------------
                         (function (season, show, episode, languages) {
                             opensubtitles.search(show, season, episode, languages, function (subtitleList) {
-                                var filteredSubs = subtitleList.filter(subInfo => {
+                                var filteredSubs = subtitleList.filter(function (subInfo) {
                                         return releaseNameIsValid(subInfo.MovieReleaseName, show, season, episode);
                                     }),
                                     subs = {},
                                     torrents = {};
 
-                                filteredSubs.forEach(subInfo => {
+                                filteredSubs.forEach(function (subInfo) {
                                     var lang = subInfo.SubLanguageID,
                                         distribution = getDistribution(subInfo.MovieReleaseName);
 
@@ -75,14 +75,14 @@ function katoss(searchJSON) {
                                         return console.log('KickAssTorrent connection problem', err);
                                     }
 
-                                    var filteredTorrents = response.list.filter(torrentInfo => {
+                                    var filteredTorrents = response.list.filter(function (torrentInfo) {
                                         var title = torrentInfo.title.trim(),
                                             regIgnoredWords = new RegExp(config.ignoredWords.join('|'), 'i');
 
                                         return releaseNameIsValid(title, show, season, episode) && !regIgnoredWords.test(title);
                                     });
 
-                                    filteredTorrents.forEach(torrentInfo => {
+                                    filteredTorrents.forEach(function (torrentInfo) {
                                         var match = torrentInfo.title.match(/480p|720p|1080p/i),
                                             quality = match ? match[0].toLowerCase() : 'UNKNOWN',
                                             distribution = getDistribution(torrentInfo.title);
@@ -95,24 +95,24 @@ function katoss(searchJSON) {
 
                                     console.log(show, 'S' + season + 'E' + episode);
 
-                                    var found = config.qualityOrder.some(quality => {
+                                    var found = config.qualityOrder.some(function (quality) {
                                         if (!torrents[quality]) {
                                             return false;
                                         }
-                                        return config.distributionOrder.some(distribution => {
+                                        return config.distributionOrder.some(function (distribution) {
                                             if (!torrents[quality][distribution]) {
                                                 return false;
                                             }
                                             // Check sub compatibility
                                             // -----------------------
-                                            return languages.some(lang => {
+                                            return languages.some(function (lang) {
                                                 if (!subs[lang] || !subs[lang][distribution]) {
                                                     return false;
                                                 }
 
                                                 var eligibleTorrents = torrents[quality][distribution];
 
-                                                return eligibleTorrents.some((torrentInfo, index) => {
+                                                return eligibleTorrents.some(function (torrentInfo, index) {
                                                     var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
                                                         torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
                                                         episodeFilename,
