@@ -1,9 +1,11 @@
-var request = require('request'),
+var request = require('sync-request'),
     katoss = require('./katoss');
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 function sendAPICmd(cmd, params, callback) {
     var apiKey = 'aa28d413d22138d396b018880496c957',
-        port    = '8899',
+        port = '8899',
         apiCmdUrl = 'https://192.168.1.7:' + port + '/api/' + apiKey + '/?cmd=',
         url = apiCmdUrl + cmd;
 
@@ -12,32 +14,50 @@ function sendAPICmd(cmd, params, callback) {
             if (!params.hasOwnProperty(key)) {
                 continue;
             }
-            url+= '&' + key + '=' + params[key];
+            url += '&' + key + '=' + params[key];
         }
     }
 
-    request({
-        url: url,
-        method: 'GET',
-        rejectUnauthorized: false
-    }, function (err, response, body) {
-        if (err) {
-            return console.log(err);
-        }
-        callback(JSON.parse(body).data);
-    });
+    var response = JSON.parse(request('GET', url).getBody().toString()).data;
+    callback(response);
+}
+
+function formatShowNumber(number) {
+    return parseInt(number) < 10 ? '0' + number : number;
 }
 
 // Get show id list
 // ----------------
 sendAPICmd('shows', {'sort': 'name', 'pause': 0}, function (showList) {
+    var searchJSON = {};
     for (var showName in showList) {
         if (!showList.hasOwnProperty(showName)) {
             continue;
         }
         var show = showList[showName];
-        sendAPICmd('show.seasons', {tvdbid: show.tvdbid}, function (seasons) {
-            console.log(seasons);
+        sendAPICmd('show.seasons', {tvdbid: show.tvdbid}, function (seasonList) {
+            for (var seasonNumber in seasonList) {
+                if (!seasonList.hasOwnProperty(seasonNumber)) {
+                    continue;
+                }
+                var season = formatShowNumber(seasonNumber),
+                    episodeList = seasonList[seasonNumber];
+                for (var episodeNumber in episodeList) {
+                    if (!episodeList.hasOwnProperty(episodeNumber)) {
+                        continue;
+                    }
+                    var episodeInfo = episodeList[episodeNumber],
+                        episode;
+                    if (episodeInfo.status === 'Wanted') {
+                        episode = formatShowNumber(episodeNumber);
+                        searchJSON[showName] || (searchJSON[showName] = { seasons: {} });
+                        searchJSON[showName].seasons[season] || (searchJSON[showName].seasons[season] = []);
+                        searchJSON[showName].seasons[season].push(episode);
+                    }
+                }
+            }
         });
     }
+    console.log(searchJSON);
+    katoss(searchJSON);
 });

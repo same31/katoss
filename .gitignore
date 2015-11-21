@@ -1,3 +1,5 @@
 .idea
 dist
+downloads
 node_modules
+katoss/config.json

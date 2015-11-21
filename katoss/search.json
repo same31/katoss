@@ -1,8 +1,8 @@
 {
 	"Arrow": {
-		"Seasons": {
+		"seasons": {
 			"01": ["01"]
 		},
-		"Languages": ["fre"]
+		"languages": ["fre"]
 	}
 }
