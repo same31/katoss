@@ -17,6 +17,7 @@ function releaseNameIsValid(releaseName, show, season, episode) {
 function katoss(searchJSON, notifyManager) {
     var config = require('./config.json'),
         mkdirp = require('mkdirp'),
+        path = require('path'),
         outputPath = config.outputPath || '.',
         Torrent = require('./torrent'),
         fs = require('fs'),
@@ -115,15 +116,19 @@ function katoss(searchJSON, notifyManager) {
                                                 return eligibleTorrents.some(function (torrentInfo, index) {
                                                     var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
                                                         torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
+                                                        decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent),
+                                                        torrentName,
                                                         episodeFilename,
                                                         torrentFilename,
+                                                        subtitleFilePath,
                                                         subtitleFilename,
                                                         subInfo;
 
-                                                    if (Torrent.checkEpisodeTorrentContent(torrentContent)) {
-                                                        episodeFilename = Torrent.getEpisodeFilename(torrentContent);
-                                                        torrentFilename = outputPath + '/' + torrentFile.filename;
-
+                                                    if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
+                                                        torrentName = Torrent.getTorrentName(decodedTorrentContent);
+                                                        subtitleFilePath = path.join(outputPath, torrentName);
+                                                        episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
+                                                        torrentFilename = path.join(outputPath, torrentFile.filename);
 
                                                         subInfo = subs[lang][distribution][0];
 
@@ -132,22 +137,31 @@ function katoss(searchJSON, notifyManager) {
                                                         console.log(' Episode filename:', episodeFilename);
                                                         console.log(' Sub:', subInfo.MovieReleaseName);
 
-                                                        subtitleFilename = outputPath + '/' + episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) +
-                                                            lang.substr(0, 2) + '.srt';
+                                                        subtitleFilename = path.join(subtitleFilePath,
+                                                            episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
 
-                                                        // 1. Download subtitles
-                                                        // 2. Download torrent file (tmp)
-                                                        // 3. Notify manager (sick rage)
-                                                        // 4. tmp -> torrent
+                                                        // 1. Create directory where to download subtitles,
+                                                        //    where the movie file will be downloaded
+                                                        // 2. Download subtitles
+                                                        // 3. Download torrent file (.torrent.tmp)
+                                                        // 4. Notify manager (sick rage)
+                                                        // 5. Rename .torrent.tmp file to .torrent
+                                                        // ================================================
                                                         (function (torrentFilename, torrentContent) {
-                                                            opensubtitles.download(subInfo.IDSubtitleFile, subtitleFilename, function () {
-                                                                var hasToNotifyManager = notifyManager && tvdbid;
-                                                                fs.writeFile(torrentFilename + (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager && function () {
-                                                                    notifyManager(tvdbid, season, episode, function () {
-                                                                        fs.rename(torrentFilename + '.tmp', torrentFilename);
-                                                                    });
+                                                            mkdirp(path.join(outputPath, torrentName), function (err) {
+                                                                if (err) {
+                                                                    return console.log('Cannot create subtitle path');
+                                                                }
+                                                                opensubtitles.download(subInfo.IDSubtitleFile, subtitleFilename, function () {
+                                                                    var hasToNotifyManager = notifyManager && tvdbid;
+                                                                    fs.writeFile(torrentFilename + (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager && function () {
+                                                                            notifyManager(tvdbid, season, episode, function () {
+                                                                                fs.rename(torrentFilename + '.tmp', torrentFilename);
+                                                                            });
+                                                                        });
                                                                 });
                                                             });
+
                                                         })(torrentFilename, torrentContent);
 
                                                         return true;

@@ -33,14 +33,20 @@ function downloadTorrentFileContent(url) {
     }).getBody('binary').toString();
 }
 
-function getTorrentFiles(torrentContent) {
-    var torrentInfo = bencode.decode(torrentContent);
+function decodeTorrentContent(torrentContent) {
+    return bencode.decode(torrentContent);
+}
 
-    if (!torrentInfo.info || !torrentInfo.info.files) {
+function getTorrentName(decodeTorrentContent) {
+    return decodeTorrentContent.info && decodeTorrentContent.info.name;
+}
+
+function getTorrentFiles(decodedTorrentContent) {
+    if (!decodedTorrentContent.info || !decodedTorrentContent.info.files) {
         return [];
     }
 
-    return torrentInfo.info.files.filter(function (file) {
+    return decodedTorrentContent.info.files.filter(function (file) {
         return file.path && file.path.length > 0;
     });
 }
@@ -58,8 +64,8 @@ function fileExtensionIsMovie(filename) {
     return extension && ~['avi', 'mkv', 'mp4', 'mpg', 'mpeg'].indexOf(extension);
 }
 
-function checkEpisodeTorrentContent(torrentContent) {
-    var files = getTorrentFiles(torrentContent);
+function checkEpisodeTorrentContent(decodedTorrentContent) {
+    var files = getTorrentFiles(decodedTorrentContent);
 
     // Invalid if there is a .exe file
     // -------------------------------
@@ -77,8 +83,8 @@ function checkEpisodeTorrentContent(torrentContent) {
     });
 }
 
-function getEpisodeFilename(torrentContent) {
-    var files = getTorrentFiles(torrentContent);
+function getEpisodeFilename(decodedTorrentContent) {
+    var files = getTorrentFiles(decodedTorrentContent);
     return files.reduce(function (prevFile, file) {
         var filename = getTorrentFilesFilePath(file),
             length = parseInt(file.length);
@@ -93,7 +99,9 @@ function getEpisodeFilename(torrentContent) {
 module.exports = {
     extractTorrentFilenameAndUrl: extractTorrentFilenameAndUrl,
     checkEpisodeTorrentContent: checkEpisodeTorrentContent,
+    decodeTorrentContent: decodeTorrentContent,
     downloadTorrentFileContent: downloadTorrentFileContent,
     getEpisodeFilename: getEpisodeFilename,
+    getTorrentName: getTorrentName,
     searchEpisode: searchEpisode
 };
