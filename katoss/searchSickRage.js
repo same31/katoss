@@ -18,12 +18,25 @@ function sendAPICmd(cmd, params, callback) {
         }
     }
 
-    var response = JSON.parse(request('GET', url).getBody().toString()).data;
-    callback(response);
+    var response = request('GET', url);
+    typeof callback === 'function' && callback(JSON.parse(response.getBody().toString()).data);
 }
 
 function formatShowNumber(number) {
     return parseInt(number) < 10 ? '0' + number : number;
+}
+
+function notifySickRage(tvdbid, season, episode, callback) {
+    sendAPICmd(
+        'episode.setstatus',
+        {
+            'tvdbid': tvdbid,
+            'season': parseInt(season),
+            'episode': parseInt(episode),
+            'status': 'skipped'
+        },
+        callback
+    );
 }
 
 // Get show id list
@@ -35,29 +48,31 @@ sendAPICmd('shows', {'sort': 'name', 'pause': 0}, function (showList) {
             continue;
         }
         var show = showList[showName];
-        sendAPICmd('show.seasons', {tvdbid: show.tvdbid}, function (seasonList) {
-            for (var seasonNumber in seasonList) {
-                if (!seasonList.hasOwnProperty(seasonNumber)) {
-                    continue;
-                }
-                var season = formatShowNumber(seasonNumber),
-                    episodeList = seasonList[seasonNumber];
-                for (var episodeNumber in episodeList) {
-                    if (!episodeList.hasOwnProperty(episodeNumber)) {
+        (function (tvdbid) {
+            sendAPICmd('show.seasons', {tvdbid: tvdbid}, function (seasonList) {
+                for (var seasonNumber in seasonList) {
+                    if (!seasonList.hasOwnProperty(seasonNumber)) {
                         continue;
                     }
-                    var episodeInfo = episodeList[episodeNumber],
-                        episode;
-                    if (episodeInfo.status === 'Wanted') {
-                        episode = formatShowNumber(episodeNumber);
-                        searchJSON[showName] || (searchJSON[showName] = { seasons: {} });
-                        searchJSON[showName].seasons[season] || (searchJSON[showName].seasons[season] = []);
-                        searchJSON[showName].seasons[season].push(episode);
+                    var season = formatShowNumber(seasonNumber),
+                        episodeList = seasonList[seasonNumber];
+                    for (var episodeNumber in episodeList) {
+                        if (!episodeList.hasOwnProperty(episodeNumber)) {
+                            continue;
+                        }
+                        var episodeInfo = episodeList[episodeNumber],
+                            episode;
+                        if (episodeInfo.status === 'Wanted') {
+                            episode = formatShowNumber(episodeNumber);
+                            searchJSON[showName] || (searchJSON[showName] = {seasons: {}, tvdbid: tvdbid});
+                            searchJSON[showName].seasons[season] || (searchJSON[showName].seasons[season] = []);
+                            searchJSON[showName].seasons[season].push(episode);
+                        }
                     }
                 }
-            }
-        });
+            });
+        })(show.tvdbid);
     }
     console.log(searchJSON);
-    katoss(searchJSON);
+    katoss(searchJSON, notifySickRage);
 });

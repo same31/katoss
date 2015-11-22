@@ -35,7 +35,7 @@ function search(show, season, episode, languages, callback) {
     });
 }
 
-function download (subtitleFileId, filename) {
+function download (subtitleFileId, filename, callback) {
     client.methodCall('DownloadSubtitles', [token, [subtitleFileId]], function (err, response) {
         if (err || !response || !response.data || !response.data[0] || !response.data[0].data) {
             return console.log('Error while downloading subtitles', err);
@@ -45,7 +45,7 @@ function download (subtitleFileId, filename) {
             if (err) {
                 return console.log('Error with subtitles unzip');
             }
-            fs.writeFile(filename, buffer);
+            fs.writeFile(filename, buffer, callback);
         });
     });
 }
