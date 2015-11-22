@@ -17,7 +17,6 @@ function releaseNameIsValid(releaseName, show, season, episode) {
 function katoss(searchJSON, notifyManager) {
     var config = require('./config.json'),
         mkdirp = require('mkdirp'),
-        chmod = require('chmod'),
         path = require('path'),
         outputPath = config.outputPath || '.',
         Torrent = require('./torrent'),
