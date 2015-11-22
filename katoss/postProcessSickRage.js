@@ -13,7 +13,9 @@ var movieDest = process.argv[2],
     find = require('find'),
     config = require('./config.json'),
     outputPath = config.outputPath || '.',
-    subSrcBase = pathinfo(movieSrc).basename;
+    subSrcBase = movieSrc.substr(movieSrc.lastIndexOf('/'), movieSrc.lastIndexOf('.'));
+
+console.log(subSrcBase);
 
 find.file(new RegExp('^' + subSrcBase + '\.[a-zA-Z]{2,3}\.srt$'), outputPath, function(files) {
     console.log(files);
