@@ -8,6 +8,7 @@
   "dependencies": {
     "bencode-js": "0.0.7",
     "bootstrap": "^3.3.5",
+    "chmod": "^0.2.1",
     "js-polyfills": "^0.1.12",
     "kickass-torrent": "0.0.3",
     "mkdirp": "^0.5.1",
