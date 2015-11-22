@@ -131,8 +131,13 @@ function katoss(searchJSON) {
                                                         console.log(' Episode filename:', episodeFilename);
                                                         console.log(' Sub:', subInfo.MovieReleaseName);
 
-                                                        subtitleFilename = outputPath + '/' + episodeFilename + '.' + lang.substr(0, 2) + '.srt';
+                                                        subtitleFilename = outputPath + '/' + episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) +
+                                                                            lang.substr(0, 2) + '.srt';
 
+                                                        // 1. Download subtitles
+                                                        // 2. Download torrent file (tmp)
+                                                        // 3. Notify manager (sick rage)
+                                                        // 4. tmp -> torrent
                                                         opensubtitles.download(subInfo.IDSubtitleFile, subtitleFilename);
 
                                                         return true;

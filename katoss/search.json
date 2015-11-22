@@ -1,8 +1,8 @@
 {
-	"Arrow": {
+	"South Park": {
 		"seasons": {
-			"01": ["01"]
+			"19": ["07", "08"]
 		},
-		"languages": ["fre"]
+		"languages": ["fre", "eng"]
 	}
 }

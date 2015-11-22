@@ -37,8 +37,8 @@ function search(show, season, episode, languages, callback) {
 
 function download (subtitleFileId, filename) {
     client.methodCall('DownloadSubtitles', [token, [subtitleFileId]], function (err, response) {
-        if (!response.data || !response.data[0] || !response.data[0].data) {
-            return console.log('Error while downloading subtitles');
+        if (err || !response || !response.data || !response.data[0] || !response.data[0].data) {
+            return console.log('Error while downloading subtitles', err);
         }
 
         zlib.unzip(new Buffer(response.data[0].data, 'base64'), function (err, buffer) {
