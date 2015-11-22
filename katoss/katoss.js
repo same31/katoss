@@ -138,7 +138,7 @@ function katoss(searchJSON, notifyManager) {
                                                         console.log(' Sub:', subInfo.MovieReleaseName);
 
                                                         subtitleFilename = path.join(subtitleFilePath,
-                                                            episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
+                                                            episodeFilename.substr(0, episodeFilename.lastIndexOf('.')) + 'srt');
 
                                                         // 1. Create directory where to download subtitles,
                                                         //    where the movie file will be downloaded
