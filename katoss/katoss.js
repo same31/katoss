@@ -157,15 +157,15 @@ function katoss (searchJSON, notifyManager) {
 
                                                     if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
                                                         episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
-                                                        torrentFilename = path.join(outputPath, torrentFile.filename);
+                                                        torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
                                                         subInfo = subs[lang][distribution][0];
 
                                                         console.log(show, 'S' + season + 'E' + episode);
                                                         console.log('>>>', quality, distribution, lang);
-                                                        console.log(' Torrent:', torrents[quality][distribution][index].title);
-                                                        console.log(' Episode filename:', episodeFilename);
-                                                        console.log(' Sub:', subInfo.SubFileName, '[' + subInfo.MovieReleaseName + ']\n');
+                                                        console.log(' Torrent:', torrents[quality][distribution][index].title.trim());
+                                                        console.log(' Episode filename:', episodeFilename.trim());
+                                                        console.log(' Sub:', subInfo.SubFileName.trim(), '[' + subInfo.MovieReleaseName.trim() + ']\n');
 
                                                         subtitleFilename = path.join(outputPath,
                                                             episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');

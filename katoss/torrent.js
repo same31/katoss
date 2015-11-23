@@ -17,7 +17,7 @@ function searchEpisode (show, season, episode, callback) {
 }
 
 function extractTorrentFilenameAndUrl (url) {
-    var urlMatches = url.match(/^(.+)\?title=(.+)$/);
+    var urlMatches = url.trim().match(/^(.+)\?title=(.+)$/);
     if (!urlMatches) {
         throw Error('URL and filename cannot be extracted from this URL ' + url);
     }
@@ -29,6 +29,7 @@ function extractTorrentFilenameAndUrl (url) {
 }
 
 function downloadTorrentFileContent (url) {
+    url = url.trim();
     typeof window === 'undefined' || (url = url.replace(/^(https:\/\/torcache\.net(:\d+)?.+)$/, getLocationOrigin() + '/download?url=$1'));
     var response = request('GET', url, {
         followAllRedirects: true,
@@ -63,11 +64,11 @@ function getTorrentFiles (decodedTorrentContent) {
 }
 
 function getTorrentFilesFilePath (file) {
-    return file.path[file.path.length - 1];
+    return file.path[file.path.length - 1].trim();
 }
 
 function getFileExtension (filename) {
-    return filename.substr((~-filename.lastIndexOf('.') >>> 0) + 2).toLowerCase();
+    return filename.trim().substr((~-filename.lastIndexOf('.') >>> 0) + 2).toLowerCase();
 }
 
 function fileExtensionIsMovie (filename) {

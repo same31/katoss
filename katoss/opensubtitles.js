@@ -45,7 +45,7 @@ function download (subtitleFileId, filename, callback) {
             if (err) {
                 return console.log('Error with subtitles unzip');
             }
-            fs.writeFile(filename, buffer, typeof callback === 'function' && callback);
+            fs.writeFile(filename.trim(), buffer, typeof callback === 'function' && callback);
         });
     });
 }
