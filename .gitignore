@@ -1,5 +1,5 @@
 .idea
 dist
+/katoss/config.json
 downloads
 node_modules
-katoss/config.json
