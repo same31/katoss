@@ -1,8 +1,26 @@
 {
-	"South Park": {
+	"Aquarius (2015)": {
 		"seasons": {
-			"19": ["07", "08"]
-		},
-		"languages": ["fre", "eng"]
+			"01": ["01"]
+		}
+	},"Grey's Anatomy": {
+		"seasons": {
+			"12": ["01"]
+		}
+	},
+	"Marvel's Agents of S.H.I.E.L.D": {
+		"seasons": {
+			"01": ["01"]
+		}
+	},
+    "Mr. Robot": {
+		"seasons": {
+			"01": ["01"]
+		}
+	},
+    "Young & Hungry": {
+		"seasons": {
+			"01": ["01"]
+		}
 	}
 }

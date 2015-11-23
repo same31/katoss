@@ -7,9 +7,13 @@ function getLocationOrigin () {
         (window.location.port ? ':' + window.location.port : '');
 }
 
+function formatShowTitle (show) {
+    return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/'|&/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
+}
+
 function searchEpisode (show, season, episode, callback) {
     var url = typeof window !== 'undefined' && getLocationOrigin() + '/kat';
-    kickass({ q: show + ' S' + season + 'E' + episode, url: url }, typeof callback === 'function' && callback);
+    kickass({ q: formatShowTitle(show) + ' S' + season + 'E' + episode, url: url }, typeof callback === 'function' && callback);
 }
 
 function extractTorrentFilenameAndUrl (url) {
@@ -26,11 +30,18 @@ function extractTorrentFilenameAndUrl (url) {
 
 function downloadTorrentFileContent (url) {
     typeof window === 'undefined' || (url = url.replace(/^(https:\/\/torcache\.net(:\d+)?.+)$/, getLocationOrigin() + '/download?url=$1'));
-    return request('GET', url, {
+    var response = request('GET', url, {
         followAllRedirects: true,
         encoding:           'binary',
         gzip:               true
-    }).getBody('binary').toString();
+    });
+
+    if (response.statusCode >= 300) {
+        console.log('Server responded with status code', response.statusCode, 'while downloading torrent file', url);
+        return false;
+    }
+
+    return response.getBody('binary').toString();
 }
 
 function decodeTorrentContent (torrentContent) {
@@ -103,6 +114,7 @@ module.exports = {
     checkEpisodeTorrentContent:   checkEpisodeTorrentContent,
     decodeTorrentContent:         decodeTorrentContent,
     downloadTorrentFileContent:   downloadTorrentFileContent,
+    formatShowTitle:              formatShowTitle,
     getEpisodeFilename:           getEpisodeFilename,
     getTorrentName:               getTorrentName,
     searchEpisode:                searchEpisode
