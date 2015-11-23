@@ -6,6 +6,6 @@
   "ignoredWords": ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
   "languages": ["fre", "eng"],
   "showLanguages": {
-    "Grey's Anatomy": ["fre"]
+    "Sample TV show title": ["fre"]
   }
 }

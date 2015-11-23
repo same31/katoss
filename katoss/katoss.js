@@ -91,9 +91,17 @@ function katoss (searchJSON, notifyManager) {
 
                                     var filteredTorrents = response.list.filter(function (torrentInfo) {
                                         var title           = torrentInfo.title.trim(),
-                                            regIgnoredWords = new RegExp(config.ignoredWords.join('|'), 'i');
+                                            ignoredWords = config.ignoredWords || [],
+                                            regIgnoredWords;
 
-                                        return releaseNameIsValid(title, show, season, episode) && !regIgnoredWords.test(title);
+                                        if (ignoredWords.length > 0) {
+                                            regIgnoredWords = new RegExp(ignoredWords.join('|'), 'i');
+                                            if (regIgnoredWords.test(title)) {
+                                                return false;
+                                            }
+                                        }
+
+                                        return releaseNameIsValid(title, show, season, episode);
                                     });
 
                                     filteredTorrents.forEach(function (torrentInfo) {

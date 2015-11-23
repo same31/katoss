@@ -50,16 +50,6 @@ function download (subtitleFileId, filename, callback) {
     });
 }
 
-/*function releaseNameIsValid (releaseName, season, episode) {
-    // If there is a season - episode pattern, check if it is the same as provided
-    // ---------------------------------------------------------------------------
-    var match = releaseName.match(/S(\d{1,2})E(\d{1,2})/i) || releaseName.match(/(\d{1,2})x(\d{2})/i);
-    if (match) {
-        return parseInt(match[1]) === parseInt(season) && parseInt(match[2]) === parseInt(episode);
-    }
-    return true;
-}*/
-
 module.exports = {
     login:              login,
     search:             search,

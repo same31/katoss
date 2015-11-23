@@ -1,12 +1,7 @@
 {
-    "Arrow": {
+    "Sample TV show title": {
         "seasons": {
           "01": ["01", "02"]
         }
-    },
-    "Grey's Anatomy": {
-		"seasons": {
-			"12": ["01"]
-		}
-	}
+    }
 }
