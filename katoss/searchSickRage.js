@@ -1,7 +1,17 @@
-var request = require('sync-request'),
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
+var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
+    config = require('./config.json'),
+    maxQuality,
+    minDate,
+    request = require('sync-request'),
     katoss = require('./katoss');
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+if (hasToReplaceLowQuality) {
+    maxQuality = config.qualityOrder[0].toLowerCase();
+    minDate = new Date();
+    minDate.setMonth(minDate.getMonth() - 6);
+}
 
 function sendAPICmd(cmd, params, callback) {
     var apiKey = 'aa28d413d22138d396b018880496c957',
@@ -24,6 +34,16 @@ function sendAPICmd(cmd, params, callback) {
 
 function formatShowNumber(number) {
     return parseInt(number) < 10 ? '0' + number : number;
+}
+
+function hasToSearchEpisode(episodeInfo) {
+    if (hasToReplaceLowQuality) {
+        return episodeInfo.status === 'Downloaded' &&
+            episodeInfo.quality.indexOf(maxQuality) === -1 &&
+            (new Date(episodeInfo.airdate)) > minDate;
+    }
+
+    return episodeInfo.status === 'Wanted';
 }
 
 function notifySickRage(tvdbid, season, episode, callback) {
@@ -62,7 +82,7 @@ sendAPICmd('shows', {'sort': 'name', 'pause': 0}, function (showList) {
                         }
                         var episodeInfo = episodeList[episodeNumber],
                             episode;
-                        if (episodeInfo.status === 'Wanted') {
+                        if (hasToSearchEpisode(episodeInfo)) {
                             episode = formatShowNumber(episodeNumber);
                             searchJSON[showName] || (searchJSON[showName] = {seasons: {}, tvdbid: tvdbid});
                             searchJSON[showName].seasons[season] || (searchJSON[showName].seasons[season] = []);
