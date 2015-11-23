@@ -73,6 +73,6 @@ sendAPICmd('shows', {'sort': 'name', 'pause': 0}, function (showList) {
             });
         })(show.tvdbid);
     }
-    console.log(searchJSON);
+    console.log(searchJSON, '\n');
     katoss(searchJSON, notifySickRage);
 });
