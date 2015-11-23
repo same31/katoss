@@ -41,14 +41,15 @@ function katoss (searchJSON, notifyManager) {
         // --------------------------
         opensubtitles.login(function () {
             var showInfo,
-                languages;
+                languages,
+                showLanguages = config.showLanguages || {};
 
             for (show in searchJSON) {
                 if (!searchJSON.hasOwnProperty(show)) {
                     continue;
                 }
                 showInfo = searchJSON[show];
-                languages = showInfo.languages || config.languages;
+                languages = showLanguages[show] || config.languages;
 
                 for (season in showInfo.seasons) {
                     if (!showInfo.seasons.hasOwnProperty(season)) {
@@ -60,17 +61,17 @@ function katoss (searchJSON, notifyManager) {
                         // ----------------------------------------------
                         (function (tvdbid, show, season, episode, languages) {
                             opensubtitles.search(show, season, episode, languages, function (subtitleList) {
-                                //console.log(subtitleList);
                                 var filteredSubs = subtitleList.filter(function (subInfo) {
-                                        return releaseNameIsValid(subInfo.MovieReleaseName, show, season, episode);
+                                        return releaseNameIsValid(subInfo.SubFileName, show, season, episode);
                                     }),
                                     subs         = {},
                                     torrents     = {};
 
-                                //console.log(filteredSubs);
                                 filteredSubs.forEach(function (subInfo) {
                                     var lang         = subInfo.SubLanguageID,
-                                        distribution = getDistribution(subInfo.MovieReleaseName);
+                                        distribution = getDistribution(subInfo.SubFileName);
+
+                                    distribution === 'UNKNOWN' && (distribution = getDistribution(subInfo.MovieReleaseName));
 
                                     subs[lang] || (subs[lang] = {});
                                     subs[lang][distribution] || (subs[lang][distribution] = []);
@@ -88,7 +89,6 @@ function katoss (searchJSON, notifyManager) {
                                         return console.log('KickAssTorrent connection problem', err);
                                     }
 
-                                    //console.log(response.list);
                                     var filteredTorrents = response.list.filter(function (torrentInfo) {
                                         var title           = torrentInfo.title.trim(),
                                             regIgnoredWords = new RegExp(config.ignoredWords.join('|'), 'i');
@@ -96,7 +96,6 @@ function katoss (searchJSON, notifyManager) {
                                         return releaseNameIsValid(title, show, season, episode) && !regIgnoredWords.test(title);
                                     });
 
-                                    //console.log(filteredTorrents);
                                     filteredTorrents.forEach(function (torrentInfo) {
                                         var match        = torrentInfo.title.match(/480p|720p|1080p/i),
                                             quality      = match ? match[0].toLowerCase() : 'UNKNOWN',
@@ -155,8 +154,7 @@ function katoss (searchJSON, notifyManager) {
                                                         console.log('>>>', quality, distribution, lang);
                                                         console.log(' Torrent:', torrents[quality][distribution][index].title);
                                                         console.log(' Episode filename:', episodeFilename);
-                                                        console.log(' Sub:', subInfo.MovieReleaseName);
-                                                        console.log('\n');
+                                                        console.log(' Sub:', subInfo.SubFileName, '[' + subInfo.MovieReleaseName + ']\n');
 
                                                         subtitleFilename = path.join(outputPath,
                                                             episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');

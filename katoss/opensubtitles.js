@@ -5,11 +5,11 @@ var xmlrpc = require('xmlrpc'),
         path: '/xml-rpc'
     }),
     config = require('./config.json'),
-    zlib = require('zlib'),
-    fs = require('fs'),
+    zlib   = require('zlib'),
+    fs     = require('fs'),
     _token;
 
-function login(callback) {
+function login (callback) {
     client.methodCall('LogIn', ['', '', 'fr', config.openSubtitlesUserAgent], function (err, response) {
         if (err) {
             return console.log('OpenSubtitles connection problem', err);
@@ -20,12 +20,12 @@ function login(callback) {
     });
 }
 
-function search(show, season, episode, languages, callback) {
+function search (show, season, episode, languages, callback) {
     client.methodCall('SearchSubtitles', [_token, [{
         'sublanguageid': languages.join(),
-        'query': show,
-        'season': season,
-        'episode': episode
+        'query':         show,
+        'season':        season,
+        'episode':       episode
     }]], function (err, response) {
         if (err || !response.data) {
             return console.log('OpenSubtitles connection problem', err, response);
@@ -50,8 +50,18 @@ function download (subtitleFileId, filename, callback) {
     });
 }
 
+/*function releaseNameIsValid (releaseName, season, episode) {
+    // If there is a season - episode pattern, check if it is the same as provided
+    // ---------------------------------------------------------------------------
+    var match = releaseName.match(/S(\d{1,2})E(\d{1,2})/i) || releaseName.match(/(\d{1,2})x(\d{2})/i);
+    if (match) {
+        return parseInt(match[1]) === parseInt(season) && parseInt(match[2]) === parseInt(episode);
+    }
+    return true;
+}*/
+
 module.exports = {
-    login: login,
-    search: search,
-    download: download
+    login:              login,
+    search:             search,
+    download:           download
 };

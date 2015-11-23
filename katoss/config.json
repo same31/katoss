@@ -4,6 +4,9 @@
   "ignoredWords": ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
   "qualityOrder": ["1080p", "720p", "480p", "UNKNOWN"],
   "distributionOrder": ["BLURAY", "WEB-DL", "HDTV", "SDTV", "UNKNOWN"],
+  "outputPath": "downloads",
   "languages": ["fre", "eng"],
-  "outputPath": "downloads"
+  "showLanguages": {
+    "Grey's Anatomy": ["fre"]
+  }
 }
