@@ -1,10 +1,9 @@
 {
   "openSubtitlesUserAgent": "OSTestUserAgent",
-  "qualityMax": "1080p",
-  "ignoredWords": ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
+  "outputPath": "downloads",
   "qualityOrder": ["1080p", "720p", "480p", "UNKNOWN"],
   "distributionOrder": ["BLURAY", "WEB-DL", "HDTV", "UNKNOWN"],
-  "outputPath": "downloads",
+  "ignoredWords": ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
   "languages": ["fre", "eng"],
   "showLanguages": {
     "Grey's Anatomy": ["fre"]

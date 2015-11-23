@@ -97,9 +97,12 @@ function katoss (searchJSON, notifyManager) {
                                     });
 
                                     filteredTorrents.forEach(function (torrentInfo) {
-                                        var match        = torrentInfo.title.match(/480p|720p|1080p/i),
-                                            quality      = match ? match[0].toLowerCase() : 'UNKNOWN',
-                                            distribution = getDistribution(torrentInfo.title);
+                                        var qualityPattern = config.qualityOrder.filter(function (quality) {
+                                                return quality.toUpperCase() !== 'UNKNOWN';
+                                            }).join('|'),
+                                            match          = torrentInfo.title.match(new RegExp(qualityPattern, 'i')),
+                                            quality        = match ? match[0].toLowerCase() : 'UNKNOWN',
+                                            distribution   = getDistribution(torrentInfo.title);
 
                                         torrents[quality] || (torrents[quality] = {});
                                         torrents[quality][distribution] || (torrents[quality][distribution] = []);
