@@ -1,13 +1,12 @@
 module.exports = function (grunt) {
-
     var config = {
-        dir: {
-			dist: './dist',
-			nodeModules: './node_modules',
-			ui: './ui'
-		},
-        port: grunt.option('port') || 5000,
-        bsPort: grunt.option('bsPort') || 8432,
+        dir:            {
+            dist:        './dist',
+            nodeModules: './node_modules',
+            ui:          './ui'
+        },
+        port:           grunt.option('port') || 5000,
+        bsPort:         grunt.option('bsPort') || 8432,
         livereloadPort: grunt.option('livereloadPort') || 35678
     };
 

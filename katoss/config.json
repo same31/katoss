@@ -1,5 +1,5 @@
 {
-  "opensubtitlesAPIKey": "webcoreTv v1",
+  "openSubtitlesUserAgent": "webcoreTv v1",
   "qualityMax": "1080p",
   "ignoredWords": ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
   "qualityOrder": ["1080p", "720p", "480p", "UNKNOWN"],

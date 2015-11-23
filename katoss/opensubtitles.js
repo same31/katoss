@@ -7,21 +7,21 @@ var xmlrpc = require('xmlrpc'),
     config = require('./config.json'),
     zlib = require('zlib'),
     fs = require('fs'),
-    token;
+    _token;
 
 function login(callback) {
-    client.methodCall('LogIn', ['', '', 'fr', config.opensubtitlesAPIKey], function (err, response) {
+    client.methodCall('LogIn', ['', '', 'fr', config.openSubtitlesUserAgent], function (err, response) {
         if (err) {
             return console.log('OpenSubtitles connection problem', err);
         }
-        token = response.token;
+        _token = response.token;
 
-        callback(token);
+        typeof callback === 'function' && callback(_token);
     });
 }
 
 function search(show, season, episode, languages, callback) {
-    client.methodCall('SearchSubtitles', [token, [{
+    client.methodCall('SearchSubtitles', [_token, [{
         'sublanguageid': languages.join(),
         'query': show,
         'season': season,
@@ -31,12 +31,12 @@ function search(show, season, episode, languages, callback) {
             return console.log('OpenSubtitles connection problem', err, response);
         }
 
-        callback(response.data);
+        typeof callback === 'function' && callback(response.data);
     });
 }
 
 function download (subtitleFileId, filename, callback) {
-    client.methodCall('DownloadSubtitles', [token, [subtitleFileId]], function (err, response) {
+    client.methodCall('DownloadSubtitles', [_token, [subtitleFileId]], function (err, response) {
         if (err || !response || !response.data || !response.data[0] || !response.data[0].data) {
             return console.log('Error while downloading subtitles', err);
         }
@@ -45,7 +45,7 @@ function download (subtitleFileId, filename, callback) {
             if (err) {
                 return console.log('Error with subtitles unzip');
             }
-            fs.writeFile(filename, buffer, callback);
+            fs.writeFile(filename, buffer, typeof callback === 'function' && callback);
         });
     });
 }

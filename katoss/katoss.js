@@ -1,28 +1,27 @@
-function getDistribution(title) {
-    var match = title.match(/HDTV|WEB.DL|BRRIP|BDRIP|BluRay/i);
+function getDistribution (title) {
+    var match = title.match(/HDTV|WEB.DL|WEB.?RIP|BRRIP|BDRIP|BLURAY/i);
     return match
         ? match[0].toUpperCase()
-        .replace(/WEB.DL/, 'WEB-DL')
-        .replace(/BRRIP|BDRIP|BluRay/, 'BLURAY')
+        .replace(/WEB.DL|WEB.?RIP/, 'WEB-DL')
+        .replace(/BRRIP|BDRIP|BLURAY/, 'BLURAY')
         : 'UNKNOWN';
 }
 
-function releaseNameIsValid(releaseName, show, season, episode) {
+function releaseNameIsValid (releaseName, show, season, episode) {
     var reg = new RegExp('^' + show.replace(/ +/g, '.') + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
         parseInt(season) + 'x' + episode + '|' + season + 'x' + parseInt(episode) + '|' +
         parseInt(season) + 'x' + parseInt(episode) + ')', 'i');
     return reg.test(releaseName.trim());
 }
 
-function katoss(searchJSON, notifyManager) {
-    var config = require('./config.json'),
-        mkdirp = require('mkdirp'),
-        path = require('path'),
-        outputPath = config.outputPath || '.',
-        Torrent = require('./torrent'),
-        fs = require('fs'),
+function katoss (searchJSON, notifyManager) {
+    var config        = require('./config.json'),
+        mkdirp        = require('mkdirp'),
+        path          = require('path'),
+        outputPath    = config.outputPath || '.',
+        Torrent       = require('./torrent'),
+        fs            = require('fs'),
         opensubtitles = require('./opensubtitles'),
-        url = require('url'),
         show,
         season,
         episodeList;
@@ -58,11 +57,11 @@ function katoss(searchJSON, notifyManager) {
                                 var filteredSubs = subtitleList.filter(function (subInfo) {
                                         return releaseNameIsValid(subInfo.MovieReleaseName, show, season, episode);
                                     }),
-                                    subs = {},
-                                    torrents = {};
+                                    subs         = {},
+                                    torrents     = {};
 
                                 filteredSubs.forEach(function (subInfo) {
-                                    var lang = subInfo.SubLanguageID,
+                                    var lang         = subInfo.SubLanguageID,
                                         distribution = getDistribution(subInfo.MovieReleaseName);
 
                                     subs[lang] || (subs[lang] = {});
@@ -77,15 +76,15 @@ function katoss(searchJSON, notifyManager) {
                                     }
 
                                     var filteredTorrents = response.list.filter(function (torrentInfo) {
-                                        var title = torrentInfo.title.trim(),
+                                        var title           = torrentInfo.title.trim(),
                                             regIgnoredWords = new RegExp(config.ignoredWords.join('|'), 'i');
 
                                         return releaseNameIsValid(title, show, season, episode) && !regIgnoredWords.test(title);
                                     });
 
                                     filteredTorrents.forEach(function (torrentInfo) {
-                                        var match = torrentInfo.title.match(/480p|720p|1080p/i),
-                                            quality = match ? match[0].toLowerCase() : 'UNKNOWN',
+                                        var match        = torrentInfo.title.match(/480p|720p|1080p/i),
+                                            quality      = match ? match[0].toLowerCase() : 'UNKNOWN',
                                             distribution = getDistribution(torrentInfo.title);
 
                                         torrents[quality] || (torrents[quality] = {});
@@ -114,8 +113,8 @@ function katoss(searchJSON, notifyManager) {
                                                 var eligibleTorrents = torrents[quality][distribution];
 
                                                 return eligibleTorrents.some(function (torrentInfo, index) {
-                                                    var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
-                                                        torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
+                                                    var torrentFile           = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
+                                                        torrentContent        = Torrent.downloadTorrentFileContent(torrentFile.url),
                                                         decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent),
                                                         episodeFilename,
                                                         torrentFilename,
@@ -128,7 +127,7 @@ function katoss(searchJSON, notifyManager) {
 
                                                         subInfo = subs[lang][distribution][0];
 
-                                                        console.log(' ' + quality, distribution, lang);
+                                                        console.log('>>>', quality, distribution, lang);
                                                         console.log(' Torrent:', torrents[quality][distribution][index].title);
                                                         console.log(' Episode filename:', episodeFilename);
                                                         console.log(' Sub:', subInfo.MovieReleaseName);
@@ -144,7 +143,8 @@ function katoss(searchJSON, notifyManager) {
                                                         (function (torrentFilename, torrentContent) {
                                                             opensubtitles.download(subInfo.IDSubtitleFile, subtitleFilename, function () {
                                                                 var hasToNotifyManager = notifyManager && tvdbid;
-                                                                fs.writeFile(torrentFilename + (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager && function () {
+                                                                fs.writeFile(torrentFilename +
+                                                                    (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager && function () {
                                                                         notifyManager(tvdbid, season, episode, function () {
                                                                             fs.rename(torrentFilename + '.tmp', torrentFilename);
                                                                         });
@@ -156,15 +156,14 @@ function katoss(searchJSON, notifyManager) {
                                                     }
                                                 });
                                             });
-
                                         });
                                     });
 
                                     if (!found) {
                                         console.log('Not found.');
                                     }
-                                    console.log("\n");
-                                })
+                                    console.log('\n');
+                                });
                             });
                         })(showInfo.tvdbid, show, season, episode, languages);
                     });

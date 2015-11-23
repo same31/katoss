@@ -11,7 +11,7 @@ var fs = require('fs'),
         },
         changeOrigin: true   // for vhosted sites, changes host header to match to target's host
     }),
-    download = require('tamper')(function (req, res) {
+    /*download = require('tamper')(function (req, res) {
         var match = req.url.match(/^\/download\?url=(.+)/);
         if (match) {
             var torrentContent = require('sync-request')('GET', match[1], {
@@ -21,14 +21,12 @@ var fs = require('fs'),
             }).getBody('binary').toString();
 
             // FIXME: Error 500
-
             return function () {
                 return torrentContent;
-            }
-
+            };
         }
         return false;
-    }),
+    }),*/
     indexRedirect = function (req, res, next) {
         console.log('red', req.url);
         var location = url.parse(req.url),
