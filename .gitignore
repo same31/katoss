@@ -1,5 +1,4 @@
-.idea
-dist
+/.idea
 /katoss/config.json
-downloads
-node_modules
+/downloads
+/node_modules
