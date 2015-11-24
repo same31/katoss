@@ -19,10 +19,10 @@ function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
 function releaseNameIsValid (releaseName, show, season, episode) {
     show = show.trim()
         .replace(/ ?\(\d{4}\)$/g, '')
-        .replace(/'/g, '\'?')
+        .replace(/('|,)/g, '$1?')
         .replace(/ ?& ?/g, '.+')
         .replace(/ +/g, '.')
-        .replace(/.+/g, '.');
+        .replace(/\.+/g, '.');
     var reg = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
         parseInt(season) + 'x' + episode + '|' + season + 'x' + parseInt(episode) + '|' +
         parseInt(season) + 'x' + parseInt(episode) + ')', 'i');
