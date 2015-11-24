@@ -107,6 +107,7 @@ sendAPICmd('shows', { 'sort': 'name', 'pause': 0 }, function (showList) {
             });
         })(show.tvdbid);
     }
-    console.log(searchJSON, '\n');
+    console.log(searchJSON);
+    console.log('\n');
     katoss(searchJSON, notifySickRage);
 });
