@@ -47,6 +47,16 @@ Valid values are _BluRay_, _WEB-DL_, _HDTV_ and _unknown_.
 Usage
 -----
 
+Search can be performed by providing a JSON search file or using a Sick Beard API.
+
+
+### Search with a JSON file
+
+To be described.
+
+
+### Search using a Sick Beard API
+
 To be described.
 
 

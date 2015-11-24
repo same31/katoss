@@ -195,7 +195,7 @@ function katoss (searchJSON, notifyManager) {
 
                                                         // 1. Download & write subtitles file
                                                         // 2. Write torrent file (.torrent.tmp)
-                                                        // 3. Notify manager (sickBeard)
+                                                        // 3. Notify manager (Sick Beard)
                                                         // 4. Rename .torrent.tmp file to .torrent
                                                         // =======================================
                                                         (function (torrentFilename, torrentContent) {
