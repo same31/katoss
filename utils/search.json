@@ -1,7 +1,42 @@
 {
-    "Sample TV show title": {
-        "seasons": {
-          "01": ["01", "02"]
-        }
+  "Arrow": {
+    "seasons": {
+      "01": [
+        "01",
+        "02"
+      ]
     }
+  },
+  "CSI: Cyber": {
+    "seasons": {
+      "01": [
+        "01",
+        "02"
+      ]
+    }
+  },
+  "You're The Worst": {
+    "seasons": {
+      "01": [
+        "01",
+        "02"
+      ]
+    }
+  },
+  "You, Me and The Apocalypse": {
+    "seasons": {
+      "01": [
+        "01",
+        "02"
+      ]
+    }
+  },
+  "Hawaii 5-0": {
+    "seasons": {
+      "01": [
+        "01",
+        "02"
+      ]
+    }
+  }
 }
