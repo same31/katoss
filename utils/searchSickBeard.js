@@ -62,6 +62,7 @@ if (hasToReplaceLowQuality) {
     addEpisodeToSearch = function (searchJSONShow, seasonNumber, episodeNumber, currentQuality) {
         originalAddEpisodeToSearch(searchJSONShow, seasonNumber, episodeNumber);
 
+        searchJSONShow.currentQualities || (searchJSONShow.currentQualities = {});
         searchJSONShow.currentQualities[seasonNumber] || (searchJSONShow.currentQualities[seasonNumber] = []);
         searchJSONShow.currentQualities[seasonNumber].push(currentQuality);
     };
