@@ -1,6 +1,6 @@
-var bencode = require('bencode-js'),
-    kickass = require('kickass-torrent'),
-    request = require('sync-request');
+var kickass = require('kickass-torrent'),
+    request = require('sync-request'),
+    bencode = require('bencode-js');
 
 function getLocationOrigin () {
     return window.location.origin || window.location.protocol + '//' + window.location.hostname +
@@ -8,7 +8,7 @@ function getLocationOrigin () {
 }
 
 function formatShowTitle (show) {
-    return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/([^A-Za-z0-9 \.])/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
+    return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/'|&|,|:/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
 }
 
 function searchEpisode (show, season, episode, callback) {
