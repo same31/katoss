@@ -7,6 +7,15 @@ function getDistribution (title) {
         : 'UNKNOWN';
 }
 
+function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
+    var qualityPattern = allowedQualityList.filter(function (quality) {
+            return quality.toUpperCase() !== 'UNKNOWN';
+        }).join('|'),
+        match          = releaseName.match(new RegExp(qualityPattern, 'i'));
+
+    return match ? match[0].toLowerCase() : 'UNKNOWN';
+}
+
 function releaseNameIsValid (releaseName, show, season, episode) {
     show = show.trim()
         .replace(/ ?\(\d{4}\)$/g, '')
@@ -20,6 +29,16 @@ function releaseNameIsValid (releaseName, show, season, episode) {
     return reg.test(releaseName.trim());
 }
 
+function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualityList) {
+    if (!currentQuality) {
+        return true;
+    }
+
+    currentQuality = getReleaseQualityFromAllowed(currentQuality, allowedQualityList);
+
+    return allowedQualityList.indexOf(foundQuality) > allowedQualityList.indexOf(currentQuality);
+}
+
 function katoss (searchJSON, notifyManager) {
     var config        = require('./config.json'),
         mkdirp        = require('mkdirp'),
@@ -27,10 +46,7 @@ function katoss (searchJSON, notifyManager) {
         outputPath    = config.outputPath || '.',
         Torrent       = require('./torrent'),
         fs            = require('fs'),
-        opensubtitles = require('./opensubtitles'),
-        show,
-        season,
-        episodeList;
+        opensubtitles = require('./opensubtitles');
 
     mkdirp(outputPath, function (err) {
         if (err) {
@@ -40,7 +56,11 @@ function katoss (searchJSON, notifyManager) {
         // Login to opensubtitles api
         // --------------------------
         opensubtitles.login(function () {
-            var showInfo,
+            var show,
+                season,
+                episodeList,
+                currentQualityList,
+                showInfo,
                 languages,
                 showLanguages = config.showLanguages || {};
 
@@ -55,11 +75,15 @@ function katoss (searchJSON, notifyManager) {
                     if (!showInfo.seasons.hasOwnProperty(season)) {
                         continue;
                     }
+
                     episodeList = showInfo.seasons[season];
-                    episodeList.forEach(function (episode) {
+                    currentQualityList = showInfo.currentQualities && showInfo.currentQualities[season];
+                    episodeList.forEach(function (episode, index) {
+                        var currentQuality = currentQualityList && currentQualityList[index];
+
                         // Search available subtitles for TV show episode
                         // ----------------------------------------------
-                        (function (tvdbid, show, season, episode, languages) {
+                        (function (tvdbid, show, season, episode, languages, currentQuality) {
                             opensubtitles.search(show, season, episode, languages, function (subtitleList) {
                                 var filteredSubs = subtitleList.filter(function (subInfo) {
                                         return releaseNameIsValid(subInfo.SubFileName, show, season, episode);
@@ -90,7 +114,7 @@ function katoss (searchJSON, notifyManager) {
                                     }
 
                                     var filteredTorrents = response.list.filter(function (torrentInfo) {
-                                        var title           = torrentInfo.title.trim(),
+                                        var title        = torrentInfo.title.trim(),
                                             ignoredWords = config.ignoredWords || [],
                                             regIgnoredWords;
 
@@ -105,17 +129,15 @@ function katoss (searchJSON, notifyManager) {
                                     });
 
                                     filteredTorrents.forEach(function (torrentInfo) {
-                                        var qualityPattern = config.qualityOrder.filter(function (quality) {
-                                                return quality.toUpperCase() !== 'UNKNOWN';
-                                            }).join('|'),
-                                            match          = torrentInfo.title.match(new RegExp(qualityPattern, 'i')),
-                                            quality        = match ? match[0].toLowerCase() : 'UNKNOWN',
-                                            distribution   = getDistribution(torrentInfo.title);
+                                        var quality      = getReleaseQualityFromAllowed(torrentInfo.title, config.qualityOrder),
+                                            distribution = getDistribution(torrentInfo.title);
 
-                                        torrents[quality] || (torrents[quality] = {});
-                                        torrents[quality][distribution] || (torrents[quality][distribution] = []);
+                                        if (qualityIsHigherThanCurrent(quality, currentQuality, config.qualityOrder)) {
+                                            torrents[quality] || (torrents[quality] = {});
+                                            torrents[quality][distribution] || (torrents[quality][distribution] = []);
 
-                                        torrents[quality][distribution].push(torrentInfo);
+                                            torrents[quality][distribution].push(torrentInfo);
+                                        }
                                     });
 
                                     if (filteredTorrents.length <= 0) {
@@ -200,7 +222,7 @@ function katoss (searchJSON, notifyManager) {
                                     }
                                 });
                             });
-                        })(showInfo.tvdbid, show, season, episode, languages);
+                        })(showInfo.tvdbid, show, season, episode, languages, currentQuality);
                     });
                 }
             }
