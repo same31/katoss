@@ -1,4 +1,5 @@
 /.idea
-/katoss/config.json
-/downloads
 /node_modules
+/downloads
+/katoss/config.json
+/katoss/search.json

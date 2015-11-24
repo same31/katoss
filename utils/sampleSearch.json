@@ -1,0 +1,7 @@
+{
+  "Sample TV Show title": {
+    "seasons": {
+      "01": ["01", "02"]
+    }
+  }
+}
