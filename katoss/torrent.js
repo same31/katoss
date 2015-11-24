@@ -1,6 +1,6 @@
-var kickass = require('kickass-torrent'),
-    request = require('sync-request'),
-    bencode = require('bencode-js');
+var bencode = require('bencode-js'),
+    kickass = require('kickass-torrent'),
+    request = require('sync-request');
 
 function getLocationOrigin () {
     return window.location.origin || window.location.protocol + '//' + window.location.hostname +

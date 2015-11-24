@@ -1,11 +1,13 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
-    config                 = require('./config.json'),
-    maxQuality,
-    minDate,
+    config                 = require('../katoss/config.json'),
+    katoss                 = require('../katoss/katoss'),
     request                = require('sync-request'),
-    katoss                 = require('./katoss');
+    hasToSearchEpisode,
+    addEpisodeToSearch,
+    maxQuality,
+    minDate;
 
 if (hasToReplaceLowQuality) {
     maxQuality = config.qualityOrder[0].toLowerCase();
@@ -14,9 +16,11 @@ if (hasToReplaceLowQuality) {
 }
 
 function sendAPICmd (cmd, params, callback) {
-    var apiKey    = 'aa28d413d22138d396b018880496c957',
-        port      = '8899',
-        apiCmdUrl = 'https://192.168.1.7:' + port + '/api/' + apiKey + '/?cmd=',
+    var apiKey    = config.sickBeard.apiKey,
+        protocol = config.sickBeard.protocol || 'http',
+        host = config.sickBeard.host || '127.0.0.1',
+        port      = config.sickBeard.port || 80,
+        apiCmdUrl = protocol + '//' + host + ':' + port + '/api/' + apiKey + '/?cmd=',
         url       = apiCmdUrl + cmd;
 
     if (params) {
@@ -36,7 +40,7 @@ function formatShowNumber (number) {
     return parseInt(number) < 10 ? '0' + number : number;
 }
 
-var hasToSearchEpisode = hasToReplaceLowQuality
+hasToSearchEpisode = hasToReplaceLowQuality
     ?
     function (episodeInfo) {
         return episodeInfo.status === 'Downloaded' &&
@@ -48,7 +52,7 @@ var hasToSearchEpisode = hasToReplaceLowQuality
         return episodeInfo.status === 'Wanted';
     };
 
-var addEpisodeToSearch = function (searchJSONShow, seasonNumber, episodeNumber) {
+addEpisodeToSearch = function (searchJSONShow, seasonNumber, episodeNumber) {
     searchJSONShow.seasons[seasonNumber] || (searchJSONShow.seasons[seasonNumber] = []);
     searchJSONShow.seasons[seasonNumber].push(episodeNumber);
 };
@@ -62,7 +66,7 @@ if (hasToReplaceLowQuality) {
     };
 }
 
-function notifySickRage (tvdbid, season, episode, callback) {
+function notifySickBeard (tvdbid, season, episode, callback) {
     sendAPICmd(
         'episode.setstatus',
         {
@@ -109,5 +113,5 @@ sendAPICmd('shows', { 'sort': 'name', 'pause': 0 }, function (showList) {
     }
     console.log(searchJSON);
     console.log('\n');
-    katoss(searchJSON, notifySickRage);
+    katoss(searchJSON, notifySickBeard);
 });

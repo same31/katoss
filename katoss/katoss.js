@@ -41,12 +41,12 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
 
 function katoss (searchJSON, notifyManager) {
     var config        = require('./config.json'),
-        mkdirp        = require('mkdirp'),
-        path          = require('path'),
-        outputPath    = config.outputPath || '.',
+        opensubtitles = require('./opensubtitles'),
         Torrent       = require('./torrent'),
+        mkdirp        = require('mkdirp'),
         fs            = require('fs'),
-        opensubtitles = require('./opensubtitles');
+        path          = require('path'),
+        outputPath    = config.outputPath || '.';
 
     mkdirp(outputPath, function (err) {
         if (err) {
@@ -194,7 +194,7 @@ function katoss (searchJSON, notifyManager) {
 
                                                         // 1. Download & write subtitles file
                                                         // 2. Write torrent file (.torrent.tmp)
-                                                        // 3. Notify manager (sick rage)
+                                                        // 3. Notify manager (sickBeard)
                                                         // 4. Rename .torrent.tmp file to .torrent
                                                         // =======================================
                                                         (function (torrentFilename, torrentContent) {

@@ -1,12 +1,12 @@
-var xmlrpc = require('xmlrpc'),
+var config = require('./config.json'),
+    fs     = require('fs'),
+    zlib   = require('zlib'),
+    xmlrpc = require('xmlrpc'),
     client = xmlrpc.createClient({
         host: 'api.opensubtitles.org',
         port: 80,
         path: '/xml-rpc'
     }),
-    config = require('./config.json'),
-    zlib   = require('zlib'),
-    fs     = require('fs'),
     _token;
 
 function login (callback) {
