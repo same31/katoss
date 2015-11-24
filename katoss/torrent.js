@@ -8,7 +8,7 @@ function getLocationOrigin () {
 }
 
 function formatShowTitle (show) {
-    return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/'|&/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
+    return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/([^A-Za-z0-9 \.])/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
 }
 
 function searchEpisode (show, season, episode, callback) {
