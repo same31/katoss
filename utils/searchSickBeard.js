@@ -20,7 +20,7 @@ function sendAPICmd (cmd, params, callback) {
         protocol = config.sickBeard.protocol || 'http',
         host = config.sickBeard.host || '127.0.0.1',
         port      = config.sickBeard.port || 80,
-        apiCmdUrl = protocol + '//' + host + ':' + port + '/api/' + apiKey + '/?cmd=',
+        apiCmdUrl = protocol + '://' + host + ':' + port + '/api/' + apiKey + '/?cmd=',
         url       = apiCmdUrl + cmd;
 
     if (params) {
