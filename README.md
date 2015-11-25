@@ -21,10 +21,18 @@ a personal user agent string following these directions:
 Installation
 ------------
 
+### Method 1
+
+The easiest way to install katoss is by downloading the latest release archive from
+<https://github.com/same31/katoss/releases/latest>.
+
+
+### Method 2 for developers
+
 1. Clone this repository: `git clone https://github.com/same31/katoss.git`
 2. Type `npm install` to install the dependencies.
 3. Rename (or copy) the _katoss/sampleConfig.json_ configuration file to _katoss/config.json_
-4. Fill in your Open Subtitles user agent string into this configuration file
+and edit it to configure katoss.
 
 
 Configuration
