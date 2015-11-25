@@ -34,7 +34,8 @@ function downloadTorrentFileContent (url) {
     var response = request('GET', url, {
         followAllRedirects: true,
         encoding:           'binary',
-        gzip:               true
+        gzip:               true,
+        retry:              true
     });
 
     if (response.statusCode >= 300) {

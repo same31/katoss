@@ -17,11 +17,13 @@ if (hasToReplaceLowQuality) {
 
 function sendAPICmd (cmd, params, callback) {
     var apiKey    = config.sickBeard.apiKey,
-        protocol = config.sickBeard.protocol || 'http',
-        host = config.sickBeard.host || '127.0.0.1',
+        protocol  = config.sickBeard.protocol || 'http',
+        host      = config.sickBeard.host || '127.0.0.1',
         port      = config.sickBeard.port || 80,
         apiCmdUrl = protocol + '://' + host + ':' + port + '/api/' + apiKey + '/?cmd=',
-        url       = apiCmdUrl + cmd;
+        url       = apiCmdUrl + cmd,
+        response,
+        responseData;
 
     if (params) {
         for (var key in params) {
@@ -32,8 +34,26 @@ function sendAPICmd (cmd, params, callback) {
         }
     }
 
-    var response = request('GET', url);
-    typeof callback === 'function' && callback(JSON.parse(response.getBody().toString()).data);
+    response = request('GET', url, { retry: true });
+
+    if (response.statusCode >= 300) {
+        console.log('[' + cmd + '] Sick Beard server responded with status code', response.statusCode);
+        console.log(params);
+        return false;
+    }
+
+    if (typeof callback === 'function') {
+        try {
+            responseData = JSON.parse(response.getBody().toString()).data;
+        }
+        catch (err) {
+            console.log('[' + cmd + '] Error while parsing Sick Beard response', err);
+            console.log(params);
+            return false;
+        }
+
+        callback(responseData);
+    }
 }
 
 function formatShowNumber (number) {

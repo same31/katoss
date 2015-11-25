@@ -12,7 +12,7 @@ var config = require('./config.json'),
 function login (callback) {
     client.methodCall('LogIn', ['', '', 'fr', config.openSubtitlesUserAgent], function (err, response) {
         if (err) {
-            return console.log('OpenSubtitles connection problem', err);
+            return console.log('[LogIn] OpenSubtitles connection problem', err);
         }
         _token = response.token;
 
@@ -28,7 +28,7 @@ function search (show, season, episode, languages, callback) {
         'episode':       episode
     }]], function (err, response) {
         if (err || !response.data) {
-            return console.log('OpenSubtitles connection problem', err, response);
+            return console.log('[SearchSubtitles] OpenSubtitles connection problem', err, response);
         }
 
         typeof callback === 'function' && callback(response.data);
@@ -38,12 +38,12 @@ function search (show, season, episode, languages, callback) {
 function download (subtitleFileId, filename, callback) {
     client.methodCall('DownloadSubtitles', [_token, [subtitleFileId]], function (err, response) {
         if (err || !response || !response.data || !response.data[0] || !response.data[0].data) {
-            return console.log('Error while downloading subtitles', err);
+            return console.log('[DownloadSubtitles] OpenSubtitles connection problem', err, response);
         }
 
         zlib.unzip(new Buffer(response.data[0].data, 'base64'), function (err, buffer) {
             if (err) {
-                return console.log('Error with subtitles unzip');
+                return console.log('Error with subtitles unzip', err);
             }
             fs.writeFile(filename.trim(), buffer, typeof callback === 'function' && callback);
         });

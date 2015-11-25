@@ -111,7 +111,7 @@ function katoss (searchJSON, notifyManager) {
 
                                 Torrent.searchEpisode(show, season, episode, function (err, response) {
                                     if (err) {
-                                        return console.log('KickAssTorrent connection problem', err);
+                                        return console.log('Kickass Torrents connection problem', err);
                                     }
 
                                     var filteredTorrents = response.list.filter(function (torrentInfo) {
