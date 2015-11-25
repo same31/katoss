@@ -1,10 +1,21 @@
 {
   "name": "katoss",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "KickAss Torrents + Open Subtitles Search",
+  "keywords": ["kickass", "torrent", "opensubtitles", "subtitles", "TV shows"],
   "author": {
-    "name": "Same"
+    "name": "Matthieu Mitrani",
+    "email": "matthieu.mitrani@gmail.com",
+    "url": "https://github.com/same31"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/same31/katoss.git"
+  },
+  "homepage": "https://github.com/same31/katoss",
+  "bugs": "https://github.com/same31/katoss/issues",
+  "license": "MIT",
+  "main": "katoss/katoss.js",
   "dependencies": {
     "bencode-js": "0.0.7",
     "find": "^0.2.3",
