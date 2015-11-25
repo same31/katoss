@@ -47,11 +47,19 @@ function downloadTorrentFileContent (url) {
 }
 
 function decodeTorrentContent (torrentContent) {
-    return bencode.decode(torrentContent);
+    var decodedTorrentContent;
+    try {
+        decodedTorrentContent = bencode.decode(torrentContent);
+    }
+    catch (err) {
+        console.log('Error while decoding torrent content', err);
+        return false;
+    }
+    return decodedTorrentContent;
 }
 
-function getTorrentName (decodeTorrentContent) {
-    return decodeTorrentContent.info && decodeTorrentContent.info.name;
+function getTorrentName (decodedTorrentContent) {
+    return decodedTorrentContent.info && decodedTorrentContent.info.name;
 }
 
 function getTorrentFiles (decodedTorrentContent) {

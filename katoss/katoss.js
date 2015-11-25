@@ -37,7 +37,9 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
 
     currentQuality = getReleaseQualityFromAllowed(currentQuality, allowedQualityList);
 
-    return allowedQualityList.indexOf(foundQuality) > allowedQualityList.indexOf(currentQuality);
+    var foundQualityIndex = allowedQualityList.indexOf(foundQuality);
+
+    return foundQualityIndex !== -1 && foundQualityIndex < allowedQualityList.indexOf(currentQuality);
 }
 
 function katoss (searchJSON, notifyManager) {
@@ -177,6 +179,10 @@ function katoss (searchJSON, notifyManager) {
                                                     }
 
                                                     decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent);
+
+                                                    if (!decodedTorrentContent) {
+                                                        return false;
+                                                    }
 
                                                     if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
                                                         episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
