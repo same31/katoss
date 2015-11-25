@@ -43,10 +43,10 @@ Valid values are _BluRay_, _WEB-DL_, _HDTV_ and _unknown_.
 + **languages**: Subtitles language(s) to search (3 characters code), ordered by preference. Example: ["fre", "eng"].
 + **showLanguages**: _(optional)_ Subtitles language(s) to search by show, will override the _languages_ key.
 + **sickBeard**: _(optional)_ Configuration used when connection to a Sick Beard API.
-..-**apiKey**: Your Sick Beard API key.
-..-**protocol**: _(optional)_ The protocol used to connect to the Sick Beard server, default is _http_.
-..-**host**: _(optional)_ The host used to connect to the Sick Beard server, default is _127.0.0.1_.
-..-**port**: _(optional)_ The port used to connect to the Sick Beard server, default is _80_.
+    - **apiKey**: Your Sick Beard API key.
+    - **protocol**: _(optional)_ The protocol used to connect to the Sick Beard server, default is _http_.
+    - **host**: _(optional)_ The host used to connect to the Sick Beard server, default is _127.0.0.1_.
+    - **port**: _(optional)_ The port used to connect to the Sick Beard server, default is _80_.
 
 
 Usage
