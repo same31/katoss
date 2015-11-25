@@ -40,7 +40,7 @@ Valid values are _2160p_, _1080p_, _720p_, _480p_ and _unknown_.
 + **distributionOrder**: The list of allowed distribution releases to download, ordered by preference.
 Valid values are _BluRay_, _WEB-DL_, _HDTV_ and _unknown_.
 + **ignoredWords**: _(optional)_ Torrent releases containing a word in this list will be ignored.
-+ **languages**: Subtitles language(s) to search (3 characters code), ordered by preference. Example: ["fre", "eng"].
++ **languages**: Subtitles language(s) to search (3 characters code), ordered by preference. Example: `["fre", "eng"]`.
 + **showLanguages**: _(optional)_ Subtitles language(s) to search by show, will override the _languages_ key.
 + **sickBeard**: _(optional)_ Configuration used when connection to a Sick Beard API.
     - **apiKey**: Your Sick Beard API key.
