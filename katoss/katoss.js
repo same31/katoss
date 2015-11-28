@@ -151,7 +151,7 @@ function katoss (searchJSON, notifyManager) {
                                                         episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
                                                         torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
-                                                        if (distribution === 'HDTV') {
+                                                        if (~['HDTV', 'UNKNOWN'].indexOf(distribution)) {
                                                             torrentRipTeam = utils.getRipTeam(episodeFilename);
                                                             torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
                                                             if (torrentRipTeam !== 'UNKNOWN') {
@@ -162,7 +162,7 @@ function katoss (searchJSON, notifyManager) {
 
                                                                 if (subDistributionList.length <= 0) {
                                                                     debugInfo && console.log(show, 'S' + season + 'E' + episode);
-                                                                    debugInfo && console.log('"' + lang +  '" subtitles for HDTV', torrentRipTeam, 'team not found.');
+                                                                    debugInfo && console.log('"' + lang +  '" subtitles for', distribution, 'distribution', torrentRipTeam, 'team not found.');
                                                                     return false;
                                                                 }
                                                             }
