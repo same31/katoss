@@ -25,6 +25,22 @@ function getDistribution (title) {
         : 'UNKNOWN';
 }
 
+function getRipTeam (title) {
+    var match,
+        regexp;
+
+    title = title.trim();
+
+    regexp = fileExtensionIsMovie(title) || getFileExtension(title) === 'srt'
+        ? /-([^-]+?)\.[a-zA-Z]+?$/
+        : /-([^-]+?)(\[.+?])?$/;
+
+    match = title.match(regexp);
+    return match
+        ? match[1].toUpperCase()
+        : 'UNKNOWN';
+}
+
 function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
     var qualityPattern = allowedQualityList.filter(function (quality) {
             return quality.toUpperCase() !== 'UNKNOWN';
@@ -66,6 +82,7 @@ module.exports = {
     fileExtensionIsMovie:   fileExtensionIsMovie,
     formatShowTitle:   formatShowTitle,
     getDistribution: getDistribution,
+    getRipTeam: getRipTeam,
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
     releaseNameIsValid: releaseNameIsValid,
     qualityIsHigherThanCurrent: qualityIsHigherThanCurrent

@@ -129,9 +129,11 @@ function katoss (searchJSON, notifyManager) {
                                                 return eligibleTorrents.some(function (torrentInfo, index) {
                                                     var torrentFile    = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
                                                         torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
+                                                        subDistributionList = subs[lang][distribution],
                                                         decodedTorrentContent,
                                                         episodeFilename,
                                                         torrentFilename,
+                                                        torrentRipTeam,
                                                         subtitleFilename,
                                                         subInfo;
 
@@ -149,7 +151,24 @@ function katoss (searchJSON, notifyManager) {
                                                         episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
                                                         torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
-                                                        subInfo = subs[lang][distribution][0];
+                                                        if (distribution === 'HDTV') {
+                                                            torrentRipTeam = utils.getRipTeam(episodeFilename);
+                                                            torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
+                                                            if (torrentRipTeam !== 'UNKNOWN') {
+                                                                subDistributionList = subDistributionList.filter(function (subInfo) {
+                                                                    return utils.getRipTeam(subInfo.SubFileName) === torrentRipTeam ||
+                                                                        utils.getRipTeam(subInfo.MovieReleaseName) === torrentRipTeam;
+                                                                });
+
+                                                                if (subDistributionList.length <= 0) {
+                                                                    debugInfo && console.log(show, 'S' + season + 'E' + episode);
+                                                                    debugInfo && console.log('"' + lang +  '" subtitles for HDTV', torrentRipTeam, 'team not found.');
+                                                                    return false;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        subInfo = subDistributionList[0];
 
                                                         console.log(show, 'S' + season + 'E' + episode);
                                                         console.log('>>>', quality, distribution, lang);
