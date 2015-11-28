@@ -1,4 +1,5 @@
 var config = require('./config.json'),
+    utils  = require('./utils'),
     fs     = require('fs'),
     zlib   = require('zlib'),
     xmlrpc = require('xmlrpc'),
@@ -24,14 +25,22 @@ function search (show, season, episode, languages, callback) {
     client.methodCall('SearchSubtitles', [_token, [{
         'sublanguageid': languages.join(),
         'query':         show,
-        'season':        season,
-        'episode':       episode
+        'season':        parseInt(season),
+        'episode':       parseInt(episode)
     }]], function (err, response) {
         if (err || !response.data) {
             return console.log('[SearchSubtitles] OpenSubtitles connection problem', err, response);
         }
 
-        typeof callback === 'function' && callback(response.data);
+        var formattedShowTitle = utils.formatShowTitle(show);
+        if (formattedShowTitle === show) {
+            typeof callback === 'function' && callback(response.data);
+        }
+        else {
+            search(formattedShowTitle, season, episode, languages, function (subtitlesList) {
+                typeof callback === 'function' && callback(subtitlesList.concat(response.data));
+            });
+        }
     });
 }
 

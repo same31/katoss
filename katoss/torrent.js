@@ -1,19 +1,13 @@
-var kickass = require('kickass-torrent'),
+var utils = require('./utils'),
+    kickass = require('kickass-torrent'),
     request = require('sync-request'),
     bencode = require('bencode-js');
 
-function getLocationOrigin () {
-    return window.location.origin || window.location.protocol + '//' + window.location.hostname +
-        (window.location.port ? ':' + window.location.port : '');
-}
-
-function formatShowTitle (show) {
-    return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/'|&|,|:/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
-}
 
 function searchEpisode (show, season, episode, callback) {
-    var url = typeof window !== 'undefined' && getLocationOrigin() + '/kat';
-    kickass({ q: formatShowTitle(show) + ' S' + season + 'E' + episode, url: url }, typeof callback === 'function' && callback);
+    var url = typeof window !== 'undefined' && utils.getLocationOrigin() + '/kat';
+    kickass({ q: utils.formatShowTitle(show) + ' S' + season + 'E' + episode, url: url },
+        typeof callback === 'function' && callback);
 }
 
 function extractTorrentFilenameAndUrl (url) {
@@ -30,7 +24,7 @@ function extractTorrentFilenameAndUrl (url) {
 
 function downloadTorrentFileContent (url) {
     url = url.trim();
-    typeof window === 'undefined' || (url = url.replace(/^(https:\/\/torcache\.net(:\d+)?.+)$/, getLocationOrigin() + '/download?url=$1'));
+    typeof window === 'undefined' || (url = url.replace(/^(https:\/\/torcache\.net(:\d+)?.+)$/, utils.getLocationOrigin() + '/download?url=$1'));
     var response = request('GET', url, {
         followAllRedirects: true,
         encoding:           'binary',
@@ -76,15 +70,6 @@ function getTorrentFilesFilePath (file) {
     return file.path[file.path.length - 1].trim();
 }
 
-function getFileExtension (filename) {
-    return filename.trim().substr((~-filename.lastIndexOf('.') >>> 0) + 2).toLowerCase();
-}
-
-function fileExtensionIsMovie (filename) {
-    var extension = getFileExtension(filename);
-    return extension && ~['avi', 'mkv', 'mp4', 'mpg', 'mpeg'].indexOf(extension);
-}
-
 function checkEpisodeTorrentContent (decodedTorrentContent) {
     var files = getTorrentFiles(decodedTorrentContent);
 
@@ -92,7 +77,7 @@ function checkEpisodeTorrentContent (decodedTorrentContent) {
     // -------------------------------
     if (files.some(
             function (file) {
-                return getFileExtension(getTorrentFilesFilePath(file)) === 'exe';
+                return utils.getFileExtension(getTorrentFilesFilePath(file)) === 'exe';
             })
     ) {
         return false;
@@ -102,7 +87,7 @@ function checkEpisodeTorrentContent (decodedTorrentContent) {
     // ----------------------------------------------
     return files.some(function (file) {
         var filename = getTorrentFilesFilePath(file);
-        return fileExtensionIsMovie(filename) && parseInt(file.length) > 0;
+        return utils.fileExtensionIsMovie(filename) && parseInt(file.length) > 0;
     });
 }
 
@@ -111,7 +96,7 @@ function getEpisodeFilename (decodedTorrentContent) {
     return files.reduce(function (prevFile, file) {
         var filename = getTorrentFilesFilePath(file),
             length   = parseInt(file.length);
-        if (fileExtensionIsMovie(filename) && length > prevFile.length) {
+        if (utils.fileExtensionIsMovie(filename) && length > prevFile.length) {
             return { filename: filename, length: length };
         }
 
@@ -124,7 +109,6 @@ module.exports = {
     checkEpisodeTorrentContent:   checkEpisodeTorrentContent,
     decodeTorrentContent:         decodeTorrentContent,
     downloadTorrentFileContent:   downloadTorrentFileContent,
-    formatShowTitle:              formatShowTitle,
     getEpisodeFilename:           getEpisodeFilename,
     getTorrentName:               getTorrentName,
     searchEpisode:                searchEpisode
