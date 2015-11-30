@@ -57,7 +57,8 @@ function sendAPICmd (cmd, params, callback) {
 }
 
 function formatShowNumber (number) {
-    return parseInt(number) < 10 ? '0' + number : number;
+    number = parseInt(number);
+    return number < 10 ? '0' + number : number;
 }
 
 hasToSearchEpisode = hasToReplaceLowQuality

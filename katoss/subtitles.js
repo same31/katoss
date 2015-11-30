@@ -2,7 +2,7 @@ var config         = require('./config.json'),
     Promise        = require('promise'),
     knownProviders = ['addic7ed', 'opensubtitles'],
     providers      = {
-        addic7ed:      null,
+        addic7ed:      require('addic7ed-api'),
         opensubtitles: require('./opensubtitles')
     },
     confProviders  = (config.subtitlesProviders || ['opensubtitles']).filter(function (provider) {
@@ -27,6 +27,18 @@ function search (show, season, episode, languages) {
     });
 }
 
+function download (subInfo, filename) {
+    var provider = providers[subInfo.provider];
+    if (!provider) {
+        return console.log('Unknown provider', subInfo.provider);
+    }
+    else if (typeof provider.download !== 'function') {
+        return console.log('Provider', subInfo.provider, 'does not implement download function');
+    }
+    return provider.download(subInfo, filename);
+}
+
 module.exports = {
-    search: search
+    search: search,
+    download: download
 };

@@ -1,14 +1,13 @@
-function katoss (searchJSON, notifyManager) {
-    var debugInfo     = ~process.argv.indexOf('--debug'),
-        config        = require('./config.json'),
-        subtitles     = require('./subtitles'),
-        opensubtitles = require('./opensubtitles'),
-        Torrent       = require('./torrent'),
-        utils         = require('./utils'),
-        mkdirp        = require('mkdirp'),
-        fs            = require('fs'),
-        path          = require('path'),
-        outputPath    = config.outputPath || '.';
+function katoss(searchJSON, notifyManager) {
+    var debugInfo = ~process.argv.indexOf('--debug'),
+        config = require('./config.json'),
+        subtitles = require('./subtitles'),
+        Torrent = require('./torrent'),
+        utils = require('./utils'),
+        mkdirp = require('mkdirp'),
+        fs = require('fs'),
+        path = require('path'),
+        outputPath = config.outputPath || '.';
 
     mkdirp(outputPath, function (err) {
         if (err) {
@@ -51,7 +50,7 @@ function katoss (searchJSON, notifyManager) {
                             debugInfo && console.log('Valid subtitles name list', subtitleList);
 
                             subs = subtitleList.reduce(function (subs, subInfo) {
-                                var lang         = subInfo.langId,
+                                var lang = subInfo.langId,
                                     distribution = subInfo.distribution;
 
                                 subs[lang] || (subs[lang] = {});
@@ -73,7 +72,7 @@ function katoss (searchJSON, notifyManager) {
                                 }
 
                                 var filteredTorrents = response.list.filter(function (torrentInfo) {
-                                    var title        = torrentInfo.title.trim(),
+                                    var title = torrentInfo.title.trim(),
                                         ignoredWords = config.ignoredWords || [],
                                         regIgnoredWords;
 
@@ -93,7 +92,7 @@ function katoss (searchJSON, notifyManager) {
                                 }
 
                                 torrents = filteredTorrents.reduce(function (torrents, torrentInfo) {
-                                    var quality      = utils.getReleaseQualityFromAllowed(torrentInfo.title, config.qualityOrder),
+                                    var quality = utils.getReleaseQualityFromAllowed(torrentInfo.title, config.qualityOrder),
                                         distribution = utils.getDistribution(torrentInfo.title);
 
                                     if (utils.qualityIsHigherThanCurrent(quality, currentQuality, config.qualityOrder)) {
@@ -123,8 +122,8 @@ function katoss (searchJSON, notifyManager) {
                                             var eligibleTorrents = torrents[quality][distribution];
 
                                             return eligibleTorrents.some(function (torrentInfo, index) {
-                                                var torrentFile         = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
-                                                    torrentContent      = Torrent.downloadTorrentFileContent(torrentFile.url),
+                                                var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
+                                                    torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
                                                     subDistributionList = subs[lang][distribution],
                                                     decodedTorrentContent,
                                                     episodeFilename,
@@ -152,8 +151,7 @@ function katoss (searchJSON, notifyManager) {
                                                         torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
                                                         if (torrentRipTeam !== 'UNKNOWN') {
                                                             subDistributionList = subDistributionList.filter(function (subInfo) {
-                                                                return utils.getRipTeam(subInfo.SubFileName) === torrentRipTeam ||
-                                                                    utils.getRipTeam(subInfo.MovieReleaseName) === torrentRipTeam;
+                                                                return subInfo.team === torrentRipTeam;
                                                             });
 
                                                             if (subDistributionList.length <= 0) {
@@ -171,7 +169,7 @@ function katoss (searchJSON, notifyManager) {
                                                     console.log('>>>', quality, distribution, lang);
                                                     console.log(' Torrent:', torrents[quality][distribution][index].title.trim());
                                                     console.log(' Episode filename:', episodeFilename.trim());
-                                                    console.log(' Sub:', subInfo.SubFileName.trim(), '[' + subInfo.MovieReleaseName.trim() + ']\n');
+                                                    console.log(' Sub:', subInfo.SubFileName && subInfo.SubFileName.trim(), subInfo.MovieReleaseName && '[' + subInfo.MovieReleaseName.trim() + ']', '\n');
 
                                                     subtitleFilename = path.join(outputPath,
                                                         episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
@@ -182,7 +180,7 @@ function katoss (searchJSON, notifyManager) {
                                                     // 4. Rename .torrent.tmp file to .torrent
                                                     // =======================================
                                                     (function (torrentFilename, torrentContent) {
-                                                        opensubtitles.download(subInfo, subtitleFilename).then(function () {
+                                                        subtitles.download(subInfo, subtitleFilename).then(function () {
                                                             var hasToNotifyManager = notifyManager && tvdbid;
                                                             fs.writeFile(torrentFilename +
                                                                 (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager && function () {
