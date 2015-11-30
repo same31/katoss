@@ -2,7 +2,13 @@
   "name": "katoss",
   "version": "1.0.1",
   "description": "KickAss Torrents + Open Subtitles Search",
-  "keywords": ["kickass", "torrent", "opensubtitles", "subtitles", "TV shows"],
+  "keywords": [
+    "kickass",
+    "torrent",
+    "opensubtitles",
+    "subtitles",
+    "TV shows"
+  ],
   "author": {
     "name": "Matthieu Mitrani",
     "email": "matthieu.mitrani@gmail.com",
@@ -17,10 +23,12 @@
   "license": "MIT",
   "main": "katoss/katoss.js",
   "dependencies": {
+    "addic7ed-api": "0.0.1",
     "bencode-js": "0.0.7",
     "find": "^0.2.3",
     "kickass-torrent": "0.0.3",
     "mkdirp": "^0.5.1",
+    "promise": "^7.0.4",
     "sync-request": "^2.1.0",
     "xmlrpc": "^1.3.1"
   },
