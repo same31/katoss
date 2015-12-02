@@ -2,7 +2,6 @@ var config         = require('./config.json'),
     utils          = require('./utils'),
     syncRequest    = require('sync-request'),
     bencode        = require('bencode-js'),
-    Promise        = require('promise'),
     knownProviders = ['extratorrents', 'kickass'],
     providers      = {
         extratorrents: require('./torrentProviders/extratorrents'),
@@ -13,14 +12,14 @@ var config         = require('./config.json'),
     });
 
 function searchEpisode (show, season, episode) {
-    return Promise.all(
+    return utils.allSettled(
         confProviders.map(function (provider) {
             return providers[provider].searchEpisode(show, season, episode);
         })
     ).then(function (response) {
         return response.reduce(function (prevResult, result, index) {
             var provider = confProviders[index];
-            return prevResult.concat(result.map(function (torrentInfo) {
+            return prevResult.concat((result.response || []).map(function (torrentInfo) {
                 torrentInfo.provider = provider;
                 return torrentInfo;
             }));

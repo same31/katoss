@@ -1,5 +1,5 @@
 var config         = require('./config.json'),
-    Promise        = require('promise'),
+    utils          = require('./utils'),
     knownProviders = ['addic7ed', 'opensubtitles'],
     providers      = {
         addic7ed:      require('addic7ed-api'),
@@ -10,14 +10,14 @@ var config         = require('./config.json'),
     });
 
 function search (show, season, episode, languages) {
-    return Promise.all(
+    return utils.allSettled(
         confProviders.map(function (provider) {
             return providers[provider].search(show, season, episode, languages);
         })
     ).then(function (response) {
         return response.reduce(function (prevResult, result, index) {
             var provider = confProviders[index];
-            return prevResult.concat(result.map(function (subInfo) {
+            return prevResult.concat((result.response || []).map(function (subInfo) {
                 subInfo.provider = provider;
                 return subInfo;
             }));

@@ -1,3 +1,22 @@
+function allSettled (promiseList) {
+    return new Promise(function (resolve) {
+        var promiseDone  = function (response, error, index) {
+                responseList[index] = { response: response, error: error };
+                responseList.length === promiseCount && resolve(responseList);
+            },
+            responseList = [],
+            promiseCount = promiseList.length;
+
+        promiseList.forEach(function (promise, index) {
+            promise.then(function (response) {
+                promiseDone(response, null, index);
+            }).catch(function (error) {
+                promiseDone(null, error, index);
+            });
+        });
+    });
+}
+
 function getLocationOrigin () {
     return window.location.origin || window.location.protocol + '//' + window.location.hostname +
         (window.location.port ? ':' + window.location.port : '');
@@ -77,13 +96,14 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
 }
 
 module.exports = {
-    getLocationOrigin: getLocationOrigin,
-    getFileExtension:         getFileExtension,
-    fileExtensionIsMovie:   fileExtensionIsMovie,
-    formatShowTitle:   formatShowTitle,
-    getDistribution: getDistribution,
-    getRipTeam: getRipTeam,
+    allSettled:                   allSettled,
+    getLocationOrigin:            getLocationOrigin,
+    getFileExtension:             getFileExtension,
+    fileExtensionIsMovie:         fileExtensionIsMovie,
+    formatShowTitle:              formatShowTitle,
+    getDistribution:              getDistribution,
+    getRipTeam:                   getRipTeam,
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
-    releaseNameIsValid: releaseNameIsValid,
-    qualityIsHigherThanCurrent: qualityIsHigherThanCurrent
+    releaseNameIsValid:           releaseNameIsValid,
+    qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent
 };
