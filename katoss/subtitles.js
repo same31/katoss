@@ -3,7 +3,7 @@ var config         = require('./config.json'),
     knownProviders = ['addic7ed', 'opensubtitles'],
     providers      = {
         addic7ed:      require('addic7ed-api'),
-        opensubtitles: require('./opensubtitles')
+        opensubtitles: require('./subtitlesProviders/opensubtitles')
     },
     confProviders  = (config.subtitlesProviders || ['opensubtitles']).filter(function (provider) {
         return ~knownProviders.indexOf(provider);
@@ -15,15 +15,13 @@ function search (show, season, episode, languages) {
             return providers[provider].search(show, season, episode, languages);
         })
     ).then(function (response) {
-        var subList = response.reduce(function (prevResult, result, index) {
+        return response.reduce(function (prevResult, result, index) {
             var provider = confProviders[index];
             return prevResult.concat(result.map(function (subInfo) {
                 subInfo.provider = provider;
                 return subInfo;
             }));
         }, []);
-
-        return subList;
     });
 }
 

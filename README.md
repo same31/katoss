@@ -1,10 +1,14 @@
 katoss
 ======
 
-KATOSS is an acronym for KickAss Torrents + Open Subtitles Search.
 
-Katoss allows you to download TV Show episodes from [KickAss Torrents](https://kat.cr) platform
-along with matched subtitles from [OpenSubtitles](http://http://www.opensubtitles.org) database.
+Katoss allows you to download TV Show episode torrent files from different torrent provider platforms along with matched subtitles from several databases.
+
+It may be linked to a [Sick Beard](https://github.com/midgetspy/Sick-Beard) / [SickRage](https://github.com/SickRage/SickRage) manager API to search 'Wanted' episodes.
+
+
+KATOSS was originally an acronym for [KickAss Torrents](https://kat.cr) + [OpenSubtitles](http://http://www.opensubtitles.org) Search.
+Today, it also supports [ExtraTorrents](http://extratorrents.me) and [Addic7ed](http://www.addic7ed.com) subtitles providers.
 
 
 Requirements
@@ -40,7 +44,10 @@ Configuration
 
 See the _katoss/sampleConfig.json_ for a sample configuration file.
 
-+ **openSubtitlesUserAgent**: Your personal Open Subtitles user agent string,
++ **subtitlesProviders**: _(optional)_ The list of supported subtitles databases, ordered by preference. Valid values are _opensubtitles_ and _addic7ed_.
+The default value is _opensubtitles_.
++ **torrentProviders**: _(optional)_ The list of supported torrent platforms, ordered by preference. Valid values are _kickass_ and _extratorrents_.
++ **openSubtitlesUserAgent**: _(optional)_ Your personal Open Subtitles user agent string, required if _opensubtitles_ is in your list of subtitles providers,
 see [How to request a new user agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).
 + **outputPath**: _(optional)_ The path where to downloads torrent and subtitles files, default is directory from where the script is launched.
 + **qualityOrder**: The list of allowed qualities to download, ordered by preference.
@@ -87,14 +94,25 @@ which quality does not match the first of the _qualityOrder_ in the configuratio
 About
 -----
 
-Torrent service powered by [Kickass Torrents](https://kat.cr).
+### Torrent providers
+
+[Kickass Torrents](https://kat.cr)
 
 [![Kickass Torrents logo](https://kastatic.com/images/logos/kickasstorrents.png "Kickass Torrents")](https://kat.cr)
 
+[ExtraTorrents](http://extratorrents.me)
 
-Subtitles service powered by [Open Subtitles](http://www.opensubtitles.org).
+[![ExtraTorrents logo](http://static.extratorrents.me/images/banner234x60.gif "ExtraTorrents")](http://extratorrents.me)
+
+
+### Subtitles providers
+
+[Open Subtitles](http://www.opensubtitles.org)
 
 [![Open Subtitles logo](http://static.opensubtitles.org/gfx/logo-transparent.png "Open Subtitles")](http://www.opensubtitles.org)
+
+[Addic7ed](http://www.addic7ed.com)
+
 
 License
 -------

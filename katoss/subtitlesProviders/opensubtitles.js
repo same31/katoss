@@ -1,5 +1,5 @@
-var config  = require('./config.json'),
-    utils   = require('./utils'),
+var config  = require('./../config.json'),
+    utils   = require('./../utils'),
     fs      = require('fs'),
     Promise = require('promise'),
     zlib    = require('zlib'),

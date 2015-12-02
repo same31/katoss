@@ -1,35 +1,56 @@
-var utils = require('./utils'),
-    kickass = require('kickass-torrent'),
-    request = require('sync-request'),
-    bencode = require('bencode-js');
+var config         = require('./config.json'),
+    utils          = require('./utils'),
+    syncRequest    = require('sync-request'),
+    bencode        = require('bencode-js'),
+    Promise        = require('promise'),
+    knownProviders = ['extratorrents', 'kickass'],
+    providers      = {
+        extratorrents: require('./torrentProviders/extratorrents'),
+        kickass:       require('./torrentProviders/kickass')
+    },
+    confProviders  = (config.torrentProviders || ['kickass']).filter(function (provider) {
+        return ~knownProviders.indexOf(provider);
+    });
 
-
-function searchEpisode (show, season, episode, callback) {
-    var url = typeof window !== 'undefined' && utils.getLocationOrigin() + '/kat';
-    kickass({ q: utils.formatShowTitle(show) + ' S' + season + 'E' + episode, url: url },
-        typeof callback === 'function' && callback);
+function searchEpisode (show, season, episode) {
+    return Promise.all(
+        confProviders.map(function (provider) {
+            return providers[provider].searchEpisode(show, season, episode);
+        })
+    ).then(function (response) {
+        return response.reduce(function (prevResult, result, index) {
+            var provider = confProviders[index];
+            return prevResult.concat(result.map(function (torrentInfo) {
+                torrentInfo.provider = provider;
+                return torrentInfo;
+            }));
+        }, []);
+    });
 }
 
-function extractTorrentFilenameAndUrl (url) {
-    var urlMatches = url.trim().match(/^(.+)\?title=(.+)$/);
-    if (!urlMatches) {
-        throw Error('URL and filename cannot be extracted from this URL ' + url);
+function extractTorrentFilenameAndUrl (torrentInfo) {
+    var provider = providers[torrentInfo.provider];
+    if (!provider) {
+        return console.log('Unknown provider', torrentInfo.provider);
     }
-
-    return {
-        url:      urlMatches[1],
-        filename: urlMatches[2] + '.torrent'
-    };
+    else if (typeof provider.extractTorrentFilenameAndUrl !== 'function') {
+        return console.log('Provider', torrentInfo.provider, 'does not implement extractTorrentFilenameAndUrl function');
+    }
+    return provider.extractTorrentFilenameAndUrl(torrentInfo);
 }
 
 function downloadTorrentFileContent (url) {
     url = url.trim();
-    typeof window === 'undefined' || (url = url.replace(/^(https:\/\/torcache\.net(:\d+)?.+)$/, utils.getLocationOrigin() + '/download?url=$1'));
-    var response = request('GET', url, {
+    var response = syncRequest('GET', url, {
         followAllRedirects: true,
         encoding:           'binary',
         gzip:               true,
-        retry:              true
+        retry:              true,
+        headers:            {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma':        'no-cache',
+            'Expires':       '0'
+        }
     });
 
     if (response.statusCode >= 300) {

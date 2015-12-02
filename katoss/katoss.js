@@ -66,12 +66,10 @@ function katoss(searchJSON, notifyManager) {
                                 return console.log('No subtitles found.\n');
                             }
 
-                            Torrent.searchEpisode(show, season, episode, function (err, response) {
-                                if (err) {
-                                    return console.log('Kickass Torrents connection problem', err);
-                                }
-
-                                var filteredTorrents = response.list.filter(function (torrentInfo) {
+                            Torrent.searchEpisode(show, season, episode).catch(function (err) {
+                                console.log(err);
+                            }).then(function (torrentList) {
+                                var filteredTorrents = torrentList.filter(function (torrentInfo) {
                                     var title = torrentInfo.title.trim(),
                                         ignoredWords = config.ignoredWords || [],
                                         regIgnoredWords;
@@ -122,7 +120,7 @@ function katoss(searchJSON, notifyManager) {
                                             var eligibleTorrents = torrents[quality][distribution];
 
                                             return eligibleTorrents.some(function (torrentInfo, index) {
-                                                var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo.torrentLink),
+                                                var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
                                                     torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
                                                     subDistributionList = subs[lang][distribution],
                                                     decodedTorrentContent,
