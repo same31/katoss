@@ -2,7 +2,8 @@ function allSettled (promiseList) {
     return new Promise(function (resolve) {
         var promiseDone  = function (response, error, index) {
                 responseList[index] = { response: response, error: error };
-                responseList.length === promiseCount && resolve(responseList);
+                responseList.filter(function (response) { return response !== undefined; })
+                    .length === promiseCount && resolve(responseList);
             },
             responseList = [],
             promiseCount = promiseList.length;
