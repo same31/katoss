@@ -23,7 +23,9 @@ function searchEpisode (show, season, episode) {
                 torrentInfo.provider = provider;
                 return torrentInfo;
             }));
-        }, []);
+        }, []).sort(function (a, b) {
+            return confProviders.indexOf(a.provider) - confProviders.indexOf(b.provider);
+        });
     });
 }
 
@@ -44,12 +46,7 @@ function downloadTorrentFileContent (url) {
         followAllRedirects: true,
         encoding:           'binary',
         gzip:               true,
-        retry:              true,
-        headers:            {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma':        'no-cache',
-            'Expires':       '0'
-        }
+        retry:              true
     });
 
     if (response.statusCode >= 300) {

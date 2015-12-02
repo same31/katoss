@@ -21,7 +21,9 @@ function search (show, season, episode, languages) {
                 subInfo.provider = provider;
                 return subInfo;
             }));
-        }, []);
+        }, []).sort(function (a, b) {
+            return confProviders.indexOf(a.provider) - confProviders.indexOf(b.provider);
+        });
     });
 }
 
