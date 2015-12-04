@@ -119,7 +119,7 @@ function katoss(searchJSON, notifyManager) {
 
                                             var eligibleTorrents = torrents[quality][distribution];
 
-                                            return eligibleTorrents.some(function (torrentInfo, index) {
+                                            return eligibleTorrents.some(function (torrentInfo) {
                                                 var torrentFile = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
                                                     torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
                                                     subDistributionList = subs[lang][distribution],
@@ -164,10 +164,10 @@ function katoss(searchJSON, notifyManager) {
                                                     subInfo = subDistributionList[0];
 
                                                     console.log(show, 'S' + season + 'E' + episode);
-                                                    console.log('>>>', quality, distribution, lang);
-                                                    console.log(' Torrent:', torrents[quality][distribution][index].title.trim());
+                                                    console.log('>>>', quality, distribution, lang, '[' + torrentInfo.provider, '/', subInfo.provider + ']');
+                                                    console.log(' Torrent:', torrentInfo.title.trim());
                                                     console.log(' Episode filename:', episodeFilename.trim());
-                                                    console.log(' Sub:', subInfo.SubFileName && subInfo.SubFileName.trim(), subInfo.MovieReleaseName && '[' + subInfo.MovieReleaseName.trim() + ']', '\n');
+                                                    subInfo.SubFileName && console.log(' Sub:', subInfo.SubFileName.trim(), subInfo.MovieReleaseName && '[' + subInfo.MovieReleaseName.trim() + ']', '\n');
 
                                                     subtitleFilename = path.join(outputPath,
                                                         episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');

@@ -2,7 +2,9 @@ function allSettled (promiseList) {
     return new Promise(function (resolve) {
         var promiseDone  = function (response, error, index) {
                 responseList[index] = { response: response, error: error };
-                responseList.filter(function (response) { return response !== undefined; })
+                responseList.filter(function (response) {
+                    return response !== undefined;
+                })
                     .length === promiseCount && resolve(responseList);
             },
             responseList = [],
@@ -16,6 +18,10 @@ function allSettled (promiseList) {
             });
         });
     });
+}
+
+function escapeRegExpPattern (string) {
+    return string.replace(/[()<>[{\\|^$.*+?]/g, '\\$&');
 }
 
 function getLocationOrigin () {
@@ -98,6 +104,7 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
 
 module.exports = {
     allSettled:                   allSettled,
+    escapeRegExpPattern:          escapeRegExpPattern,
     getLocationOrigin:            getLocationOrigin,
     getFileExtension:             getFileExtension,
     fileExtensionIsMovie:         fileExtensionIsMovie,
