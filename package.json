@@ -25,7 +25,7 @@
   "license": "MIT",
   "main": "katoss/katoss.js",
   "dependencies": {
-    "addic7ed-api": "^1.0.3",
+    "addic7ed-api": "^1.0.4",
     "bencode-js": "0.0.7",
     "extratorrentapi": "^1.0.1",
     "find": "^0.2.3",
