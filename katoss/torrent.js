@@ -41,7 +41,7 @@ function extractTorrentFilenameAndUrl (torrentInfo) {
 }
 
 function downloadTorrentFileContent (url) {
-    url = url.trim();
+    url          = url.trim();
     var response = syncRequest('GET', url, {
         followAllRedirects: true,
         encoding:           'binary',

@@ -5,7 +5,11 @@ var utils   = require('./../utils'),
 function searchEpisode (show, season, episode) {
     return new Promise(function (resolve, reject) {
         kickass(
-            { q: utils.formatShowTitle(show) + ' S' + season + 'E' + episode },
+            {
+                q:     utils.formatShowTitle(show) + ' S' + season + 'E' + episode,
+                field: 'seeders',
+                order: 'desc'
+            },
             function (err, data) {
                 if (err) {
                     console.log('Kickass Torrents connection problem', err);
@@ -30,6 +34,6 @@ function extractTorrentFilenameAndUrl (torrentInfo) {
 }
 
 module.exports = {
-    searchEpisode: searchEpisode,
+    searchEpisode:                searchEpisode,
     extractTorrentFilenameAndUrl: extractTorrentFilenameAndUrl
 };

@@ -58,13 +58,17 @@ function getRipTeam (title) {
     title = title.trim();
 
     regexp = fileExtensionIsMovie(title) || getFileExtension(title) === 'srt'
-        ? /-([^-]+?)\.[a-zA-Z]+?$/
+        ? /-([^-]+?)\.[a-zA-Z0-9]+?$/
         : /-([^-]+?)(\[.+?])?$/;
 
     match = title.match(regexp);
     return match
-        ? match[1].toUpperCase()
+        ? match[1].trim().toUpperCase()
         : 'UNKNOWN';
+}
+
+function formatRipTeam (ripTeam) {
+    return ripTeam.replace('0', 'O');
 }
 
 function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
@@ -111,6 +115,7 @@ module.exports = {
     formatShowTitle:              formatShowTitle,
     getDistribution:              getDistribution,
     getRipTeam:                   getRipTeam,
+    formatRipTeam:                formatRipTeam,
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
     releaseNameIsValid:           releaseNameIsValid,
     qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent

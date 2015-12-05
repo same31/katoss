@@ -1,19 +1,19 @@
 {
-  "openSubtitlesUserAgent": "OSTestUserAgent",
-  "outputPath": "downloads",
-  "qualityOrder": ["1080p", "720p", "480p", "UNKNOWN"],
-  "distributionOrder": ["BLURAY", "WEB-DL", "HDTV", "UNKNOWN"],
-  "ignoredWords": ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
-  "subtitlesProviders": ["opensubtitles", "addic7ed"],
-  "torrentProviders": ["kickass", "extratorrents"],
-  "languages": ["fre", "eng"],
-  "showLanguages": {
-    "Sample TV show title": ["fre"]
-  },
-  "sickBeard": {
-    "protocol": "http",
-    "host": "127.0.0.1",
-    "port": 80,
-    "apiKey": "Sick Beard API Key"
-  }
+    "openSubtitlesUserAgent": "OSTestUserAgent",
+    "outputPath":             "downloads",
+    "qualityOrder":           ["1080p", "720p", "480p", "UNKNOWN"],
+    "distributionOrder":      ["BLURAY", "WEB-DL", "HDTV", "UNKNOWN"],
+    "ignoredWords":           ["german", "french", "core2hd", "dutch", "swedish", "vostfr", "h265", "x265", "hevc"],
+    "subtitlesProviders":     ["opensubtitles", "addic7ed"],
+    "torrentProviders":       ["kickass", "extratorrents"],
+    "languages":              ["fre", "eng"],
+    "showLanguages":          {
+        "Sample TV show title": ["fre"]
+    },
+    "sickBeard":              {
+        "protocol": "http",
+        "host":     "127.0.0.1",
+        "port":     80,
+        "apiKey":   "Sick Beard API Key"
+    }
 }

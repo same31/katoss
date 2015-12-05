@@ -19,6 +19,7 @@ function search (show, season, episode, languages) {
             var provider = confProviders[index];
             return prevResult.concat((result.response || []).map(function (subInfo) {
                 subInfo.provider = provider;
+                subInfo.team     = utils.formatRipTeam(subInfo.team);
                 return subInfo;
             }));
         }, []).sort(function (a, b) {
@@ -39,6 +40,6 @@ function download (subInfo, filename) {
 }
 
 module.exports = {
-    search: search,
+    search:   search,
     download: download
 };

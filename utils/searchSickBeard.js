@@ -11,7 +11,7 @@ var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
 
 if (hasToReplaceLowQuality) {
     maxQuality = config.qualityOrder[0].toLowerCase();
-    minDate = new Date();
+    minDate    = new Date();
     minDate.setMonth(minDate.getMonth() - 6);
 }
 
@@ -80,7 +80,7 @@ addEpisodeToSearch = function (searchJSONShow, seasonNumber, episodeNumber) {
 
 if (hasToReplaceLowQuality) {
     var originalAddEpisodeToSearch = addEpisodeToSearch;
-    addEpisodeToSearch = function (searchJSONShow, seasonNumber, episodeNumber, currentQuality) {
+    addEpisodeToSearch             = function (searchJSONShow, seasonNumber, episodeNumber, currentQuality) {
         originalAddEpisodeToSearch(searchJSONShow, seasonNumber, episodeNumber);
 
         searchJSONShow.currentQualities || (searchJSONShow.currentQualities = {});

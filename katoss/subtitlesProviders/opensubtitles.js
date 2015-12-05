@@ -50,7 +50,7 @@ function search (show, season, episode, languages) {
                         subInfo.distribution = utils.getDistribution(subInfo.SubFileName);
                         subInfo.distribution === 'UNKNOWN' && (subInfo.distribution = utils.getDistribution(subInfo.MovieReleaseName));
                         subInfo.langId = subInfo.SubLanguageID;
-                        subInfo.team = utils.getRipTeam(subInfo.SubFileName);
+                        subInfo.team   = utils.getRipTeam(subInfo.SubFileName);
                         subInfo.team === 'UNKNOWN' && (subInfo.team = utils.getRipTeam(subInfo.MovieReleaseName));
                         return subInfo;
                     });

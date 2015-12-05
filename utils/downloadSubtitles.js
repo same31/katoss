@@ -1,7 +1,7 @@
-var movieFile  = process.argv[2],
-    config     = require('../katoss/config.json'),
-    utils      = require('../katoss/utils'),
-    subtitles  = require('../katoss/subtitles'),
+var movieFile = process.argv[2],
+    config    = require('../katoss/config.json'),
+    subtitles = require('../katoss/subtitles'),
+    utils     = require('../katoss/utils'),
     matches,
     show,
     filename,
@@ -19,7 +19,7 @@ episode      = matches[4];
 distribution = utils.getDistribution(filename);
 team         = utils.getRipTeam(filename);
 
-languages  = process.argv[3] && [process.argv[3]] || config.showLanguages && config.showLanguages[show] || config.languages;
+languages = process.argv[3] && [process.argv[3]] || config.showLanguages && config.showLanguages[show] || config.languages;
 
 console.log(show, season, episode, distribution, team, languages);
 
