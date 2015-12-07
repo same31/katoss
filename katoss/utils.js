@@ -52,21 +52,17 @@ function getDistribution (title) {
 }
 
 function getRipTeam (title) {
-    var pattern = '-([^-]+?)(\[.+?])?',
-        match;
+    var match,
+        regexp;
 
-    title = title.trim();
+    title = title.trim().toUpperCase().replace(/WEB(-(DL|RIP))/, ' $2');
 
-    if (fileExtensionIsMovie(title) || getFileExtension(title) === 'srt') {
-        pattern += '\.[A-Z0-9]+?';
-    }
-    pattern += '$';
+    regexp = fileExtensionIsMovie(title) || getFileExtension(title) === 'srt'
+        ? /-([^-]+?)(\[.+?])?-?\.[A-Z0-9]+?$/
+        : /-([^-]+?)(\[.+?])?$/;
 
-    match = title.toUpperCase().replace(/WEB(-(DL|RIP))/, ' $2').match(new RegExp(pattern));
-
-    console.log(match && match[1] || title);
-
-    return match ? match[1].trim() : 'UNKNOWN';
+    match = title.match(regexp);
+    return match ? match[1].trim().replace(/[^a-zA-Z0-9]/g, '') : 'UNKNOWN';
 }
 
 function formatRipTeam (ripTeam) {

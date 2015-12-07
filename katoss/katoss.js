@@ -147,7 +147,10 @@ function katoss (searchJSON, notifyManager) {
                                                     if (torrentRipTeam !== 'UNKNOWN') {
                                                         torrentRipTeam              = utils.formatRipTeam(torrentRipTeam);
                                                         filteredSubDistributionList = subDistributionList.filter(function (subInfo) {
-                                                            return ~[torrentRipTeam, 'UNKNOWN'].indexOf(subInfo.team);
+                                                            var ripTeamList = [torrentRipTeam];
+                                                            subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
+
+                                                            return ~ripTeamList.indexOf(subInfo.team);
                                                         }).sort(function (a, b) {
                                                             if (a.team === b.team) {
                                                                 return 0;
@@ -157,16 +160,19 @@ function katoss (searchJSON, notifyManager) {
                                                             }
                                                             return -1;
                                                         });
-
-                                                        if (filteredSubDistributionList.length <= 0) {
-                                                            debugInfo && console.log(show, 'S' + season + 'E' + episode);
-                                                            debugInfo && console.log('"' + lang +
-                                                                '" subtitles for', distribution, 'distribution', torrentRipTeam, 'team not found.');
-                                                            return false;
-                                                        }
+                                                    }
+                                                    else {
+                                                        filteredSubDistributionList = subs[lang][distribution] || [];
                                                     }
 
-                                                    subInfo = filteredSubDistributionList[0] || subDistributionList[0];
+                                                    if (filteredSubDistributionList.length <= 0) {
+                                                        debugInfo && console.log(show, 'S' + season + 'E' + episode);
+                                                        debugInfo && console.log('"' + lang +
+                                                            '" subtitles for', distribution, 'distribution', torrentRipTeam, 'team not found.');
+                                                        return false;
+                                                    }
+
+                                                    subInfo = filteredSubDistributionList[0];
 
                                                     console.log(show, 'S' + season + 'E' + episode);
                                                     console.log('>>>', '[' + torrentInfo.provider + ']', quality, distribution, torrentRipTeam);
