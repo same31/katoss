@@ -89,6 +89,8 @@ function katoss (searchJSON, notifyManager) {
                                     return console.log('No torrents found.\n');
                                 }
 
+                                debugInfo && console.log(filteredTorrents);
+
                                 torrents = filteredTorrents.reduce(function (torrents, torrentInfo) {
                                     var quality      = utils.getReleaseQualityFromAllowed(torrentInfo.title, config.qualityOrder),
                                         distribution = utils.getDistribution(torrentInfo.title);
