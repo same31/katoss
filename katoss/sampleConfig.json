@@ -15,5 +15,10 @@
         "host":     "127.0.0.1",
         "port":     80,
         "apiKey":   "Sick Beard API Key"
+    },
+    "kodi":                   {
+        "protocol": "http",
+        "host":     "127.0.0.1",
+        "port":     80
     }
 }
