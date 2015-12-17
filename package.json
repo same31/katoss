@@ -1,6 +1,6 @@
 {
   "name": "katoss",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "KickAss Torrents + Open Subtitles Search, also supports ExtraTorrents & addic7ed subtitles providers",
   "keywords": [
     "kickass",
@@ -25,7 +25,7 @@
   "license": "MIT",
   "main": "katoss/katoss.js",
   "dependencies": {
-    "addic7ed-api": "^1.0.8",
+    "addic7ed-api": "^1.0.9",
     "bencode-js": "0.0.7",
     "extratorrentapi": "^1.0.1",
     "find": "^0.2.3",

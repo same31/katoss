@@ -1,25 +1,17 @@
-var movieFile = process.argv[2],
-    config    = require('../katoss/config.json'),
-    subtitles = require('../katoss/subtitles'),
-    utils     = require('../katoss/utils'),
-    matches,
-    show,
-    filename,
-    season,
-    episode,
-    distribution,
-    team,
-    languages;
+var movieFile    = process.argv[2],
+    config       = require('../katoss/config.json'),
+    subtitles    = require('../katoss/subtitles'),
+    utils        = require('../katoss/utils'),
 
-matches      = movieFile.match(/\/([^\/]+)\/Season \d+\/(.+?S(\d+)E(\d+).+)$/);
-show         = matches[1];
-filename     = matches[2];
-season       = matches[3];
-episode      = matches[4];
-distribution = utils.getDistribution(filename);
-team         = utils.getRipTeam(filename);
+    matches      = movieFile.match(/\/([^\/]+)\/Season \d+\/(.+?S(\d+)E(\d+).+)$/),
+    show         = matches[1],
+    filename     = matches[2],
+    season       = matches[3],
+    episode      = matches[4],
+    distribution = utils.getDistribution(filename),
+    team         = utils.getRipTeam(filename),
 
-languages = process.argv[3] && [process.argv[3]] || config.showLanguages && config.showLanguages[show] || config.languages;
+    languages    = process.argv[3] && [process.argv[3]] || config.showLanguages && config.showLanguages[show] || config.languages;
 
 console.log(show, season, episode, distribution, team, languages);
 
@@ -29,7 +21,7 @@ subtitles.search(show, season, episode, languages)
             return languages.indexOf(a.langId) - languages.indexOf(b.langId);
         });
 
-        var downloadIfFound = function (subInfo, search) {
+        var downloadIfFound = function downloadIfFound (subInfo, search) {
             if (search) {
                 console.log(subInfo);
                 subtitles.download(
