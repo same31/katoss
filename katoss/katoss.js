@@ -5,6 +5,7 @@ function katoss (searchJSON, notifyManager) {
         Torrent    = require('./torrent'),
         utils      = require('./utils'),
         mkdirp     = require('mkdirp'),
+        queue      = require('queue'),
         fs         = require('fs'),
         path       = require('path'),
         outputPath = config.outputPath || '.';
@@ -20,7 +21,10 @@ function katoss (searchJSON, notifyManager) {
             currentQualityList,
             showInfo,
             languages,
-            showLanguages = config.showLanguages || {};
+            showLanguages = config.showLanguages || {},
+            q             = queue({ concurrency: 10, timeout: 20 * 1000 });
+
+        q.end();
 
         for (show in searchJSON) {
             if (!searchJSON.hasOwnProperty(show)) {
@@ -42,182 +46,207 @@ function katoss (searchJSON, notifyManager) {
                     // Search available subtitles for TV show episode
                     // ----------------------------------------------
                     (function (tvdbid, show, season, episode, languages, currentQuality) {
+                        q.push(function (cb) {
+                            subtitles.search(show, season, episode, languages).then(function (subtitleList) {
+                                var subs,
+                                    torrents;
 
-                        subtitles.search(show, season, episode, languages).then(function (subtitleList) {
-                            var subs,
-                                torrents;
+                                debugInfo && console.log('Valid subtitles name list', subtitleList);
 
-                            debugInfo && console.log('Valid subtitles name list', subtitleList);
+                                subs = subtitleList.reduce(function (subs, subInfo) {
+                                    var lang         = subInfo.langId,
+                                        distribution = subInfo.distribution;
 
-                            subs = subtitleList.reduce(function (subs, subInfo) {
-                                var lang         = subInfo.langId,
-                                    distribution = subInfo.distribution;
+                                    subs[lang] || (subs[lang] = {});
+                                    subs[lang][distribution] || (subs[lang][distribution] = []);
 
-                                subs[lang] || (subs[lang] = {});
-                                subs[lang][distribution] || (subs[lang][distribution] = []);
+                                    subs[lang][distribution].push(subInfo);
 
-                                subs[lang][distribution].push(subInfo);
-
-                                return subs;
-                            }, {});
-
-                            if (subtitleList.length <= 0) {
-                                console.log(show, 'S' + season + 'E' + episode);
-                                return console.log('No subtitles found.\n');
-                            }
-
-                            Torrent.searchEpisode(show, season, episode).catch(function (err) {
-                                console.log(err);
-                            }).then(function (torrentList) {
-                                var filteredTorrents = torrentList.filter(function (torrentInfo) {
-                                    var title        = torrentInfo.title.trim(),
-                                        ignoredWords = config.ignoredWords || [],
-                                        regIgnoredWords;
-
-                                    if (ignoredWords.length > 0) {
-                                        regIgnoredWords = new RegExp(ignoredWords.join('|'), 'i');
-                                        if (regIgnoredWords.test(title)) {
-                                            return false;
-                                        }
-                                    }
-
-                                    return utils.releaseNameIsValid(title, show, season, episode);
-                                });
-
-                                if (filteredTorrents.length <= 0) {
-                                    console.log(show, 'S' + season + 'E' + episode);
-                                    return console.log('No torrents found.\n');
-                                }
-
-                                debugInfo && console.log(filteredTorrents);
-
-                                torrents = filteredTorrents.reduce(function (torrents, torrentInfo) {
-                                    var quality      = utils.getReleaseQualityFromAllowed(torrentInfo.title, config.qualityOrder),
-                                        distribution = utils.getDistribution(torrentInfo.title);
-
-                                    if (utils.qualityIsHigherThanCurrent(quality, currentQuality, config.qualityOrder)) {
-                                        torrents[quality] || (torrents[quality] = {});
-                                        torrents[quality][distribution] || (torrents[quality][distribution] = []);
-
-                                        torrents[quality][distribution].push(torrentInfo);
-                                    }
-                                    return torrents;
+                                    return subs;
                                 }, {});
 
-                                var found = config.qualityOrder.some(function (quality) {
-                                    if (!torrents[quality]) {
-                                        return false;
-                                    }
-                                    return config.distributionOrder.some(function (distribution) {
-                                        if (!torrents[quality][distribution]) {
-                                            return false;
-                                        }
-                                        // Check sub compatibility
-                                        // -----------------------
-                                        return languages.some(function (lang) {
-                                            var subDistributionList,
-                                                eligibleTorrents;
-                                            if (!subs[lang] || (subDistributionList = (subs[lang][distribution] || []).concat(distribution !== 'UNKNOWN' && subs[lang]['UNKNOWN'] || [])).length <= 0) {
+                                if (subtitleList.length <= 0) {
+                                    console.log(show, 'S' + season + 'E' + episode);
+                                    cb();
+                                    return console.log('No subtitles found.\n');
+                                }
+
+                                Torrent.searchEpisode(show, season, episode).catch(function (err) {
+                                    console.log(err);
+                                    cb();
+                                }).then(function (torrentList) {
+                                    var filteredTorrents = torrentList.filter(function (torrentInfo) {
+                                        var title        = torrentInfo.title.trim(),
+                                            ignoredWords = config.ignoredWords || [],
+                                            regIgnoredWords;
+
+                                        if (ignoredWords.length > 0) {
+                                            regIgnoredWords = new RegExp(ignoredWords.join('|'), 'i');
+                                            if (regIgnoredWords.test(title)) {
                                                 return false;
                                             }
+                                        }
 
-                                            eligibleTorrents = torrents[quality][distribution];
+                                        return utils.releaseNameIsValid(title, show, season, episode);
+                                    });
 
-                                            return eligibleTorrents.some(function (torrentInfo) {
-                                                var torrentFile    = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
-                                                    torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
-                                                    decodedTorrentContent,
-                                                    filteredSubDistributionList,
-                                                    episodeFilename,
-                                                    torrentFilename,
-                                                    torrentRipTeam,
-                                                    subtitleFilename,
-                                                    subInfo;
+                                    if (filteredTorrents.length <= 0) {
+                                        console.log(show, 'S' + season + 'E' + episode);
+                                        cb();
+                                        return console.log('No torrents found.\n');
+                                    }
 
-                                                if (!torrentContent || !(decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent))) {
+                                    debugInfo && console.log(filteredTorrents);
+
+                                    torrents = filteredTorrents.reduce(function (torrents, torrentInfo) {
+                                        var quality      = utils.getReleaseQualityFromAllowed(torrentInfo.title, config.qualityOrder),
+                                            distribution = utils.getDistribution(torrentInfo.title);
+
+                                        if (utils.qualityIsHigherThanCurrent(quality, currentQuality, config.qualityOrder)) {
+                                            torrents[quality] || (torrents[quality] = {});
+                                            torrents[quality][distribution] || (torrents[quality][distribution] = []);
+
+                                            torrents[quality][distribution].push(torrentInfo);
+                                        }
+                                        return torrents;
+                                    }, {});
+
+                                    var found = config.qualityOrder.some(function (quality) {
+                                        if (!torrents[quality]) {
+                                            return false;
+                                        }
+                                        return config.distributionOrder.some(function (distribution) {
+                                            if (!torrents[quality][distribution]) {
+                                                return false;
+                                            }
+                                            // Check sub compatibility
+                                            // -----------------------
+                                            return languages.some(function (lang) {
+                                                var subDistributionList,
+                                                    eligibleTorrents;
+                                                if (!subs[lang] ||
+                                                    (subDistributionList = (subs[lang][distribution] || []).concat(distribution !== 'UNKNOWN' && subs[lang]['UNKNOWN'] ||
+                                                        [])).length <= 0) {
                                                     return false;
                                                 }
 
-                                                if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
-                                                    episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
-                                                    torrentFilename = path.join(outputPath, torrentFile.filename.trim());
+                                                eligibleTorrents = torrents[quality][distribution];
 
-                                                    torrentRipTeam = utils.getRipTeam(episodeFilename);
-                                                    torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
-                                                    if (torrentRipTeam !== 'UNKNOWN') {
-                                                        torrentRipTeam              = utils.formatRipTeam(torrentRipTeam);
-                                                        filteredSubDistributionList = subDistributionList.filter(function (subInfo) {
-                                                            var ripTeamList = [torrentRipTeam];
-                                                            subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
+                                                return eligibleTorrents.some(function (torrentInfo) {
+                                                    var torrentFile    = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
+                                                        torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
+                                                        decodedTorrentContent,
+                                                        filteredSubDistributionList,
+                                                        episodeFilename,
+                                                        torrentFilename,
+                                                        torrentRipTeam,
+                                                        subtitleFilename,
+                                                        subInfo;
 
-                                                            return ~ripTeamList.indexOf(subInfo.team);
-                                                        }).sort(function (a, b) {
-                                                            if (a.team === b.team) {
-                                                                return 0;
-                                                            }
-                                                            if (a.team === 'UNKNOWN') {
-                                                                return 1;
-                                                            }
-                                                            return -1;
-                                                        });
-                                                    }
-                                                    else {
-                                                        filteredSubDistributionList = subs[lang][distribution] || [];
-                                                    }
-
-                                                    if (filteredSubDistributionList.length <= 0) {
-                                                        debugInfo && console.log(show, 'S' + season + 'E' + episode);
-                                                        debugInfo && console.log('"' + lang +
-                                                            '" subtitles for', distribution, 'distribution', torrentRipTeam, 'team not found.');
+                                                    if (!torrentContent || !(decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent))) {
                                                         return false;
                                                     }
 
-                                                    subInfo = filteredSubDistributionList[0];
+                                                    if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
+                                                        episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
+                                                        torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
-                                                    console.log(show, 'S' + season + 'E' + episode);
-                                                    console.log('>>>', '[' + torrentInfo.provider + ']', quality, distribution, torrentRipTeam);
-                                                    console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
-                                                    console.log(' Torrent:', torrentInfo.title.trim());
-                                                    console.log(' Episode filename:', episodeFilename.trim());
-                                                    console.log(' Sub: %s\n', subInfo.SubFileName && subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version);
+                                                        torrentRipTeam = utils.getRipTeam(episodeFilename);
+                                                        torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
+                                                        if (torrentRipTeam !== 'UNKNOWN') {
+                                                            torrentRipTeam              = utils.formatRipTeam(torrentRipTeam);
+                                                            filteredSubDistributionList = subDistributionList.filter(function (subInfo) {
+                                                                var ripTeamList = [torrentRipTeam];
+                                                                subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
 
-                                                    subtitleFilename = path.join(outputPath,
-                                                        episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
+                                                                return ~ripTeamList.indexOf(subInfo.team);
+                                                            }).sort(function (a, b) {
+                                                                if (a.team === b.team) {
+                                                                    return 0;
+                                                                }
+                                                                if (a.team === 'UNKNOWN') {
+                                                                    return 1;
+                                                                }
+                                                                return -1;
+                                                            });
+                                                        }
+                                                        else {
+                                                            filteredSubDistributionList = subs[lang][distribution] || [];
+                                                        }
 
-                                                    // 1. Download & write subtitles file
-                                                    // 2. Write torrent file (.torrent.tmp)
-                                                    // 3. Notify manager (Sick Beard)
-                                                    // 4. Rename .torrent.tmp file to .torrent
-                                                    // =======================================
-                                                    (function (torrentFilename, torrentContent) {
-                                                        subtitles.download(subInfo, subtitleFilename).then(function () {
-                                                            var hasToNotifyManager = notifyManager && tvdbid;
-                                                            fs.writeFile(torrentFilename +
-                                                                (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager && function () {
-                                                                    notifyManager(tvdbid, season, episode, function () {
-                                                                        fs.rename(torrentFilename + '.tmp', torrentFilename);
-                                                                    });
-                                                                });
-                                                        });
-                                                    })(torrentFilename, torrentContent);
+                                                        if (filteredSubDistributionList.length <= 0) {
+                                                            debugInfo && console.log(show, 'S' + season + 'E' + episode);
+                                                            debugInfo && console.log('"' + lang +
+                                                                '" subtitles for', distribution, 'distribution', torrentRipTeam, 'team not found.');
+                                                            return false;
+                                                        }
 
-                                                    return true;
-                                                }
+                                                        subInfo = filteredSubDistributionList[0];
+
+                                                        console.log(show, 'S' + season + 'E' + episode);
+                                                        console.log('>>>', '[' + torrentInfo.provider + ']', quality, distribution, torrentRipTeam);
+                                                        console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
+                                                        console.log(' Torrent:', torrentInfo.title.trim());
+                                                        console.log(' Episode filename:', episodeFilename.trim());
+                                                        console.log(' Sub: %s\n', subInfo.SubFileName &&
+                                                            subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version);
+
+                                                        subtitleFilename = path.join(outputPath,
+                                                            episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
+
+                                                        // 1. Download & write subtitles file
+                                                        // 2. Write torrent file (.torrent.tmp)
+                                                        // 3. Notify manager (Sick Beard)
+                                                        // 4. Rename .torrent.tmp file to .torrent
+                                                        // =======================================
+                                                        (function (torrentFilename, torrentContent) {
+                                                            subtitles.download(subInfo, subtitleFilename).then(function () {
+                                                                var hasToNotifyManager = notifyManager && tvdbid;
+
+                                                                fs.writeFile(torrentFilename +
+                                                                    (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager ?
+                                                                    function () {
+                                                                        notifyManager(tvdbid, season, episode, function () {
+                                                                            fs.rename(torrentFilename + '.tmp', torrentFilename);
+                                                                            cb();
+                                                                        });
+                                                                    } : cb);
+                                                            });
+                                                        })(torrentFilename, torrentContent);
+
+                                                        return true;
+                                                    }
+                                                });
                                             });
                                         });
                                     });
-                                });
 
-                                if (!found) {
-                                    console.log(show, 'S' + season + 'E' + episode);
-                                    console.log('No match found between subtitles and torrents.\n');
-                                }
+                                    if (!found) {
+                                        console.log(show, 'S' + season + 'E' + episode);
+                                        console.log('No match found between subtitles and torrents.\n');
+                                        cb();
+                                    }
+                                });
                             });
                         });
                     })(showInfo.tvdbid, show, season, episode, languages, currentQuality);
+
                 });
             }
         }
+
+        q.on('timeout', function (next) {
+            console.log('Job timed out');
+            next();
+        });
+
+        console.log('Queue started');
+        q.start(function (err) {
+            if (err) {
+                return console.log('Queue error', err);
+            }
+            console.log('All done');
+        });
     });
 }
 
