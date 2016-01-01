@@ -2,7 +2,7 @@ var request    = require('request'),
     kodiConfig = require('../katoss/config.json').kodi || {},
     protocol   = kodiConfig.protocol || 'http',
     host       = kodiConfig.host || '127.0.0.1',
-    port       = kodiConfig.port || 80,
+    port       = kodiConfig.port || 8080,
     url        = protocol + '://' + host + ':' + port + '/jsonrpc',
     body       = {
         jsonrpc: '2.0',
