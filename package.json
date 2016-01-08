@@ -25,10 +25,10 @@
   "license": "MIT",
   "main": "katoss/katoss.js",
   "dependencies": {
-    "addic7ed-api": "^1.0.9",
+    "addic7ed-api": "^1.1.0",
     "bencode-js": "0.0.7",
     "extratorrentapi": "^1.1.0",
-    "find": "^0.2.3",
+    "find": "^0.2.4",
     "kickass-torrent": "0.0.3",
     "mkdirp": "^0.5.1",
     "promise": "^7.1.1",
