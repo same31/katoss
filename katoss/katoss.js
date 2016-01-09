@@ -191,8 +191,7 @@ function katoss (searchJSON, notifyManager) {
                                                             filteredSubDistributionList = subDistributionList.filter(function (subInfo) {
                                                                 var ripTeamList = [torrentRipTeam];
                                                                 subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
-
-                                                                return ~ripTeamList.indexOf(subInfo.team);
+                                                                return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
                                                             }).sort(function (a, b) {
                                                                 if (a.team === b.team) {
                                                                     return 0;

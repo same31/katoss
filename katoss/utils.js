@@ -69,6 +69,31 @@ function formatRipTeam (ripTeam) {
     return ripTeam.replace('0', 'O');
 }
 
+function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
+    var sameTeamList = [
+        ['DIMENSION', 'LOL', 'SYS'],
+        ['ASAP', 'XII', 'IMMERSE'],
+        ['FQM', 'ORENJI']
+    ];
+    return ripTeamList.some(function (ripTeam) {
+        if (ripTeam === searchedRipTeam) {
+            return true;
+        }
+
+        var i = 0,
+            l = sameTeamList.length,
+            sameTeams;
+        for (; i < l; i++) {
+            sameTeams = sameTeamList[0];
+            if (~sameTeams.indexOf(ripTeam)) {
+                return ~sameTeams.indexOf(searchedRipTeam);
+            }
+        }
+
+        return false;
+    });
+}
+
 function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
     var qualityPattern = allowedQualityList.filter(function (quality) {
             return quality.toUpperCase() !== 'UNKNOWN';
@@ -115,6 +140,7 @@ module.exports = {
     getDistribution:              getDistribution,
     getRipTeam:                   getRipTeam,
     formatRipTeam:                formatRipTeam,
+    ripTeamMatchFoundInList:      ripTeamMatchFoundInList,
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
     releaseNameIsValid:           releaseNameIsValid,
     qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent
