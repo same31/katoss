@@ -58,8 +58,8 @@ function getRipTeam (title) {
     title = title.trim().toUpperCase().replace(/WEB(-(DL|RIP))/, ' $2');
 
     regexp = fileExtensionIsMovie(title) || getFileExtension(title) === 'srt'
-        ? /-([^-]+?)(\[.+?])?-?\.[A-Z0-9]+?$/
-        : /-([^-]+?)(\[.+?])?$/;
+        ? /-([^-]+?)( ?(\[.+?])+)?-?\.[A-Z0-9]+?$/
+        : /-([^-]+?)( ?(\[.+?])+)?$/;
 
     match = title.match(regexp);
     return match ? match[1].trim().replace(/[^a-zA-Z0-9]/g, '') : 'UNKNOWN';

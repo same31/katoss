@@ -7,7 +7,7 @@ var queue = {
         Array.prototype.push.apply(this.jobList, jobs);
     },
     start:       function () {
-        var jobs = this.jobList.splice(0, this.concurrency);
+        var jobs        = this.jobList.splice(0, this.concurrency);
         this.activeJobs = this.concurrency;
 
         jobs.forEach(function (job) {
@@ -164,6 +164,21 @@ function katoss (searchJSON, notifyManager) {
                                                 }
 
                                                 eligibleTorrents = torrents[quality][distribution];
+
+                                                if (config.preferHEVC) {
+                                                    eligibleTorrents = eligibleTorrents.sort(function (a, b) {
+                                                        var regexp   = /(h|x).?265|HEVC/i,
+                                                            foundInA = regexp.test(a.title),
+                                                            foundInB = regexp.test(b.title);
+                                                        if (foundInA) {
+                                                            return foundInB ? 0 : -1;
+                                                        }
+                                                        if (foundInB) {
+                                                            return 1;
+                                                        }
+                                                        return 0;
+                                                    });
+                                                }
 
                                                 return eligibleTorrents.some(function (torrentInfo) {
                                                     var torrentFile    = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
