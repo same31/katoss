@@ -1,3 +1,39 @@
+var queue = {
+    jobList:     [],
+    concurrency: 5,
+    activeJobs:  0,
+    push:        function () {
+        var jobs = Array.prototype.slice.call(arguments);
+        Array.prototype.push.apply(this.jobList, jobs);
+    },
+    start:       function () {
+        var jobs = this.jobList.splice(0, this.concurrency);
+        this.activeJobs = this.concurrency;
+
+        jobs.forEach(function (job) {
+            setTimeout(function () {
+                job(this.next.bind(this));
+            }.bind(this), 0);
+
+        }.bind(this));
+    },
+    next:        function () {
+        var jobs = this.jobList.splice(0, 1),
+            job  = jobs[0];
+        if (job) {
+            setTimeout(function () {
+                job(this.next.bind(this));
+            }.bind(this), 0);
+        }
+        else {
+            this.activeJobs--;
+            if (this.activeJobs <= 0) {
+                console.log('All jobs done.');
+            }
+        }
+    }
+};
+
 function katoss (searchJSON, notifyManager) {
     var debugInfo  = ~process.argv.indexOf('--debug'),
         config     = require('./config.json'),
@@ -5,7 +41,6 @@ function katoss (searchJSON, notifyManager) {
         Torrent    = require('./torrent'),
         utils      = require('./utils'),
         mkdirp     = require('mkdirp'),
-        queue      = require('queue'),
         fs         = require('fs'),
         path       = require('path'),
         outputPath = config.outputPath || '.';
@@ -22,9 +57,7 @@ function katoss (searchJSON, notifyManager) {
             showInfo,
             languages,
             showLanguages = config.showLanguages || {},
-            q             = queue({ concurrency: 10, timeout: 20 * 1000 });
-
-        q.end();
+            q             = queue;
 
         for (show in searchJSON) {
             if (!searchJSON.hasOwnProperty(show)) {
@@ -92,8 +125,8 @@ function katoss (searchJSON, notifyManager) {
 
                                     if (filteredTorrents.length <= 0) {
                                         console.log(show, 'S' + season + 'E' + episode);
-                                        cb();
-                                        return console.log('No torrents found.\n');
+                                        console.log('No torrents found.\n');
+                                        return cb();
                                     }
 
                                     debugInfo && console.log(filteredTorrents);
@@ -235,18 +268,8 @@ function katoss (searchJSON, notifyManager) {
             }
         }
 
-        q.on('timeout', function (next) {
-            console.log('Job timed out');
-            next();
-        });
-
         console.log('Queue started');
-        q.start(function (err) {
-            if (err) {
-                return console.log('Queue error', err);
-            }
-            console.log('All done');
-        });
+        q.start();
     });
 }
 
