@@ -1,7 +1,7 @@
 var movieFile    = process.argv[2],
     config       = require('../katoss/config.json'),
-    subtitles    = require('../katoss/subtitles'),
-    utils        = require('../katoss/utils'),
+    subtitles    = require('../katoss/src/subtitles'),
+    utils        = require('../katoss/src/utils'),
 
     matches      = movieFile.match(/\/([^\/]+)\/Season \d+\/(.+?S(\d+)E(\d+).+)$/),
     show         = matches[1],

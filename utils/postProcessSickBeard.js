@@ -1,7 +1,7 @@
 var movieDest             = process.argv[2],
     movieSrc              = process.argv[3],
     config                = require('../katoss/config.json'),
-    utils                 = require('../katoss/utils'),
+    utils                 = require('../katoss/src/utils'),
     cleanKodiVideoLibrary = require('./cleanKodiVideoLibrary').bind(this, true),
     find                  = require('find'),
     fs                    = require('fs'),

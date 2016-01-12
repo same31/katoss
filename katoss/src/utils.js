@@ -130,6 +130,42 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
     return foundQualityIndex !== -1 && foundQualityIndex < allowedQualityList.indexOf(currentQuality);
 }
 
+var queue = {
+    jobList:     [],
+    concurrency: 5,
+    activeJobs:  0,
+    push:        function () {
+        var jobs = Array.prototype.slice.call(arguments);
+        Array.prototype.push.apply(this.jobList, jobs);
+    },
+    start:       function () {
+        var jobs        = this.jobList.splice(0, this.concurrency);
+        this.activeJobs = this.concurrency;
+
+        jobs.forEach(function (job) {
+            setTimeout(function () {
+                job(this.next.bind(this));
+            }.bind(this), 0);
+
+        }.bind(this));
+    },
+    next:        function () {
+        var jobs = this.jobList.splice(0, 1),
+            job  = jobs[0];
+        if (job) {
+            setTimeout(function () {
+                job(this.next.bind(this));
+            }.bind(this), 0);
+        }
+        else {
+            this.activeJobs--;
+            if (this.activeJobs <= 0) {
+                console.log('All jobs done.');
+            }
+        }
+    }
+};
+
 module.exports = {
     allSettled:                   allSettled,
     escapeRegExpPattern:          escapeRegExpPattern,
@@ -143,5 +179,6 @@ module.exports = {
     ripTeamMatchFoundInList:      ripTeamMatchFoundInList,
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
     releaseNameIsValid:           releaseNameIsValid,
-    qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent
+    qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent,
+    queue:                        queue
 };

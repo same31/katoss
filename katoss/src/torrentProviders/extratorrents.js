@@ -1,4 +1,4 @@
-var utils         = require('./../utils'),
+var utils         = require('./../../src/utils'),
     extratorrents = require('extratorrentapi');
 
 function searchEpisode (show, season, episode) {

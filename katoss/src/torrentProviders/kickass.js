@@ -1,4 +1,4 @@
-var utils   = require('./../utils'),
+var utils   = require('./../../src/utils'),
     kickass = require('kickass-torrent'),
     Promise = require('promise');
 
