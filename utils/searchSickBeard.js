@@ -3,7 +3,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
     config                 = require('../katoss/config.json'),
     search                 = require('../katoss/search'),
-    request                = require('sync-request'),
+    syncRequest                = require('sync-request'),
     hasToSearchEpisode,
     addEpisodeToSearch,
     maxQuality,
@@ -34,7 +34,7 @@ function sendAPICmd (cmd, params, callback) {
         }
     }
 
-    response = request('GET', url, { retry: true });
+    response = syncRequest('GET', url, { retry: true });
 
     if (response.statusCode >= 300) {
         console.log('[' + cmd + '] Sick Beard server responded with status code', response.statusCode);
