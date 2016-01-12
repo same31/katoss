@@ -1,4 +1,4 @@
-var katoss     = require('../katoss/katoss'),
+var search     = require('../katoss/search'),
     searchJSON = require('./search.json');
 
-katoss(searchJSON);
+search(searchJSON);

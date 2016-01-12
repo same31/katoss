@@ -2,7 +2,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
     config                 = require('../katoss/config.json'),
-    katoss                 = require('../katoss/katoss'),
+    search                 = require('../katoss/search'),
     request                = require('sync-request'),
     hasToSearchEpisode,
     addEpisodeToSearch,
@@ -136,5 +136,5 @@ sendAPICmd('shows', { 'sort': 'name', 'pause': 0 }, function (showList) {
     }
     console.log(searchJSON);
     console.log('\n');
-    katoss(searchJSON, notifySickBeard);
+    search(searchJSON, notifySickBeard);
 });
