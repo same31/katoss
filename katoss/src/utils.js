@@ -94,6 +94,11 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
     });
 }
 
+function getReleaseQuality (releaseName) {
+    var matches = releaseName.match(/(2160|1080|720|480)p/i);
+    return matches ? matches[0].toLowerCase() : 'UNKNOWN';
+}
+
 function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
     var qualityPattern = allowedQualityList.filter(function (quality) {
             return quality.toUpperCase() !== 'UNKNOWN';
@@ -177,6 +182,7 @@ module.exports = {
     getRipTeam:                   getRipTeam,
     formatRipTeam:                formatRipTeam,
     ripTeamMatchFoundInList:      ripTeamMatchFoundInList,
+    getReleaseQuality:            getReleaseQuality,
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
     releaseNameIsValid:           releaseNameIsValid,
     qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent,

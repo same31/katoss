@@ -3,7 +3,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
     config                 = require('../katoss/config.json'),
     search                 = require('../katoss/search'),
-    syncRequest                = require('sync-request'),
+    syncRequest            = require('sync-request'),
     hasToSearchEpisode,
     addEpisodeToSearch,
     maxQuality,
