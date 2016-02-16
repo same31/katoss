@@ -173,7 +173,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
                     if (torrentRipTeam !== 'UNKNOWN') {
                         torrentRipTeam              = utils.formatRipTeam(torrentRipTeam);
-                        filteredSubDistributionList = this.subtitles[lang][torrentInfo.distribution].filter(function (subInfo) {
+                        filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []).filter(function (subInfo) {
                             var ripTeamList = [torrentRipTeam];
                             subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
                             return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
