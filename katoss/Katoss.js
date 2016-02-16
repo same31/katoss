@@ -227,7 +227,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                                         fs.rename(torrentFilename + '.tmp', torrentFilename);
                                         this.callback();
                                     }.bind(this));
-                                } : this.callback);
+                                }.bind(this) : this.callback);
                         }.bind(this));
                     }.bind(this))(torrentFilename, torrentContent);
 
