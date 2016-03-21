@@ -55,21 +55,25 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 if (ignoredWords.length > 0) {
                     regIgnoredWords = new RegExp(ignoredWords.join('|'), 'i');
                     if (regIgnoredWords.test(title)) {
+                        debugInfo && console.log('[IGNORED TORRENT]', title, ' => got ignored word');
                         return false;
                     }
                 }
 
                 if (!utils.releaseNameIsValid(title, show, season, episode)) {
+                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => has invalid release name');
                     return false;
                 }
 
                 quality = utils.getReleaseQuality(torrentInfo.title);
                 if (!~config.qualityOrder.indexOf(quality) || !utils.qualityIsHigherThanCurrent(quality, currentQuality, config.qualityOrder)) {
+                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => quality', quality, 'is not good enough');
                     return false;
                 }
 
                 distribution = utils.getDistribution(torrentInfo.title);
                 if (!~config.distributionOrder.indexOf(distribution)) {
+                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => distribution', distribution, 'not found');
                     return false;
                 }
 
@@ -86,6 +90,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 }
 
                 if (potentialSubLanguages.length <= 0) {
+                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => cannot find a potential language match');
                     return false;
                 }
 
@@ -141,7 +146,10 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 return torrentList;
             }, this.torrentList);
 
-            debugInfo && console.log(this.torrentList);
+            debugInfo && this.torrentList.forEach(function (torrentInfo) {
+                console.log('[' + torrentInfo.provider + ']', torrentInfo.title, '[' + torrentInfo.quality + '][' + torrentInfo.distribution +
+                    ']', torrentInfo.potentialSubLanguages);
+            });
         }.bind(this));
     };
 

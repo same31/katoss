@@ -11,6 +11,9 @@ var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
 
 if (hasToReplaceLowQuality) {
     maxQuality = config.qualityOrder[0].toLowerCase();
+    // Do not search every episode in 2160p or it would search for practically the entire base
+    // ---------------------------------------------------------------------------------------
+    maxQuality === '2160p' && (maxQuality = config.qualityOrder[1].toLowerCase());
     minDate    = new Date();
     minDate.setMonth(minDate.getMonth() - 6);
 }
