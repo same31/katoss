@@ -14,7 +14,7 @@ if (hasToReplaceLowQuality) {
     // Do not search every episode in 2160p or it would search for practically the entire base
     // ---------------------------------------------------------------------------------------
     maxQuality === '2160p' && (maxQuality = config.qualityOrder[1].toLowerCase());
-    minDate    = new Date();
+    minDate = new Date();
     minDate.setMonth(minDate.getMonth() - 6);
 }
 
@@ -126,10 +126,10 @@ sendAPICmd('shows', { 'sort': 'name', 'pause': 0 }, function (showList) {
                         if (!episodeList.hasOwnProperty(episodeNumber)) {
                             continue;
                         }
-                        var episodeInfo = episodeList[episodeNumber];
+                        var episodeInfo     = episodeList[episodeNumber];
+                        episodeInfo.quality = episodeInfo.quality.replace('4K UHD', maxQuality); // Pretend it is the desired max quality
                         if (hasToSearchEpisode(episodeInfo)) {
                             searchJSON[showName] || (searchJSON[showName] = { seasons: {}, tvdbid: tvdbid });
-
                             addEpisodeToSearch(searchJSON[showName], season, formatShowNumber(episodeNumber), episodeInfo.quality);
                         }
                     }
