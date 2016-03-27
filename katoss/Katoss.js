@@ -96,6 +96,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
 
                 torrentInfo.quality               = quality;
                 torrentInfo.distribution          = utils.getDistribution(torrentInfo.title);
+                torrentInfo.ripTeam               = utils.getRipTeam(torrentInfo.title);
                 torrentInfo.potentialSubLanguages = potentialSubLanguages;
 
                 return true;
@@ -146,10 +147,12 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 return torrentList;
             }, this.torrentList);
 
-            debugInfo && this.torrentList.forEach(function (torrentInfo) {
-                console.log('[' + torrentInfo.provider + ']', torrentInfo.title, '[' + torrentInfo.quality + '][' + torrentInfo.distribution +
-                    ']', torrentInfo.potentialSubLanguages);
-            });
+            if (debugInfo) {
+                this.torrentList.forEach(function (torrentInfo) {
+                    console.log('[' + torrentInfo.provider + ']', torrentInfo.title, '[' + torrentInfo.quality + '][' + torrentInfo.distribution +
+                        '][' + torrentInfo.ripTeam + ']', torrentInfo.potentialSubLanguages);
+                });
+            }
         }.bind(this));
     };
 
@@ -159,10 +162,10 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 if (!~torrentInfo.potentialSubLanguages.indexOf(lang)) {
                     return false;
                 }
-                var torrentFile    = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
-                    torrentContent = Torrent.downloadTorrentFileContent(torrentFile.url),
+                var torrentFile                 = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
+                    torrentContent              = Torrent.downloadTorrentFileContent(torrentFile.url),
                     decodedTorrentContent,
-                    filteredSubDistributionList,
+                    filteredSubDistributionList = [],
                     episodeFilename,
                     torrentFilename,
                     torrentRipTeam,
@@ -177,10 +180,8 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
                     torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
-                    torrentRipTeam = utils.getRipTeam(episodeFilename);
-                    torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = utils.getRipTeam(torrentInfo.title));
-                    if (torrentRipTeam !== 'UNKNOWN') {
-                        torrentRipTeam              = utils.formatRipTeam(torrentRipTeam);
+                    if (torrentInfo.ripTeam !== 'UNKNOWN') {
+                        torrentRipTeam              = utils.formatRipTeam(torrentInfo.ripTeam);
                         filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
                         if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
                             filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
@@ -200,7 +201,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                             return -1;
                         });
                     }
-                    else {
+                    else if (torrentInfo.distribution !== 'UNKNOWN') {
                         filteredSubDistributionList = this.subtitles[lang][torrentInfo.distribution] || [];
                     }
 

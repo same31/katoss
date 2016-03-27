@@ -84,7 +84,7 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
             l = sameTeamList.length,
             sameTeams;
         for (; i < l; i++) {
-            sameTeams = sameTeamList[0];
+            sameTeams = sameTeamList[i];
             if (~sameTeams.indexOf(ripTeam)) {
                 return ~sameTeams.indexOf(searchedRipTeam);
             }
