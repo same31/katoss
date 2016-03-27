@@ -19,7 +19,7 @@ function searchEpisode (show, season, episode) {
     ).then(function (response) {
         return response.reduce(function (prevResult, result, index) {
             var provider = confProviders[index];
-            return prevResult.concat((result.response || []).map(function (torrentInfo) {
+            return prevResult.concat((result.response || []).filter(torrentInfo => torrentInfo.seeds > 0).map(function (torrentInfo) {
                 torrentInfo.provider = provider;
                 return torrentInfo;
             }));

@@ -168,7 +168,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     filteredSubDistributionList = [],
                     episodeFilename,
                     torrentFilename,
-                    torrentRipTeam,
+                    torrentRipTeam              = 'UNKNOWN',
                     subtitleFilename,
                     subInfo;
 
@@ -180,8 +180,13 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
                     torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
-                    if (torrentInfo.ripTeam !== 'UNKNOWN') {
-                        torrentRipTeam              = utils.formatRipTeam(torrentInfo.ripTeam);
+                    // Prefer to get the rip team from episode filename
+                    // ------------------------------------------------
+                    torrentRipTeam = utils.getRipTeam(episodeFilename);
+                    torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = torrentInfo.ripTeam);
+                    if (torrentRipTeam !== 'UNKNOWN') {
+                        torrentRipTeam = utils.formatRipTeam(torrentRipTeam);
+
                         filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
                         if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
                             filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
