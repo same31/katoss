@@ -72,7 +72,7 @@ function formatRipTeam (ripTeam) {
 function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
     var sameTeamList = [
         ['DIMENSION', 'LOL', 'SYS', 'BAJSKORV'],
-        ['ASAP', 'XII', 'IMMERSE', 'FLEET'],
+        ['ASAP', 'XII', 'IMMERSE', 'FLEET', 'SKGTV'],
         ['FQM', 'ORENJI']
     ];
     return ripTeamList.some(function (ripTeam) {
