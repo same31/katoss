@@ -35,7 +35,7 @@ function getFileExtension (filename) {
 
 function fileExtensionIsMovie (filename) {
     var extension = getFileExtension(filename);
-    return extension && ~['avi', 'mkv', 'mp4', 'mpg', 'mpeg'].indexOf(extension);
+    return extension && ~['avi', 'm4v', 'mkv', 'mp4', 'mpg', 'mpeg'].indexOf(extension);
 }
 
 function formatShowTitle (show) {
