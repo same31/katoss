@@ -107,7 +107,7 @@ function notifySickBeard (tvdbid, season, episode, callback) {
 
 // Get show id list
 // ----------------
-sendAPICmd('shows', { 'sort': 'name', 'pause': 0 }, function (showList) {
+sendAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
     var searchJSON = {};
     for (var showName in showList) {
         if (!showList.hasOwnProperty(showName)) {
