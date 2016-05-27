@@ -1,14 +1,13 @@
 function allSettled (promiseList) {
     return new Promise(function (resolve) {
-        var promiseDone  = function (response, error, index) {
+        var responseList = [],
+            promiseCount = promiseList.length,
+            promiseDone  = function (response, error, index) {
                 responseList[index] = { response: response, error: error };
                 responseList.filter(function (response) {
-                    return response !== undefined;
-                })
-                    .length === promiseCount && resolve(responseList);
-            },
-            responseList = [],
-            promiseCount = promiseList.length;
+                    return typeof response !== 'undefined';
+                }).length === promiseCount && resolve(responseList);
+            };
 
         promiseList.forEach(function (promise, index) {
             promise.then(function (response) {
