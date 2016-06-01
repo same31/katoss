@@ -41,6 +41,11 @@ function formatShowTitle (show) {
     return show.trim().replace(/ ?\(\d{4}\)$/g, '').replace(/'|&|,|:/g, '').replace(/\./g, ' ').replace(/ +/g, ' ').trim();
 }
 
+function formatShowNumber (number) {
+    number = parseInt(number);
+    return number < 10 ? '0' + number : number;
+}
+
 function getDistribution (title) {
     var match = title.match(/HDTV|WEB.DL|WEB.?RIP|BRRIP|BDRIP|BLURAY/i);
     return match
@@ -177,6 +182,7 @@ module.exports = {
     getFileExtension:             getFileExtension,
     fileExtensionIsMovie:         fileExtensionIsMovie,
     formatShowTitle:              formatShowTitle,
+    formatShowNumber:             formatShowNumber,
     getDistribution:              getDistribution,
     getRipTeam:                   getRipTeam,
     formatRipTeam:                formatRipTeam,

@@ -3,7 +3,8 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
     config                 = require('../katoss/config.json'),
     search                 = require('../katoss/search'),
-    syncRequest            = require('sync-request'),
+    formatShowNumber       = require('../katoss/src/utils').formatShowNumber,
+    sendSickBeardAPICmd    = require('./sendSickBeardAPICmd'),
     hasToSearchEpisode,
     addEpisodeToSearch,
     maxQuality,
@@ -16,52 +17,6 @@ if (hasToReplaceLowQuality) {
     maxQuality === '2160p' && (maxQuality = config.qualityOrder[1].toLowerCase());
     minDate = new Date();
     minDate.setMonth(minDate.getMonth() - 6);
-}
-
-function sendAPICmd (cmd, params, callback) {
-    var apiKey    = config.sickBeard.apiKey,
-        protocol  = config.sickBeard.protocol || 'http',
-        host      = config.sickBeard.host || '127.0.0.1',
-        port      = config.sickBeard.port || 8080,
-        apiCmdUrl = protocol + '://' + host + ':' + port + '/api/' + apiKey + '/?cmd=',
-        url       = apiCmdUrl + cmd,
-        response,
-        responseData;
-
-    if (params) {
-        for (var key in params) {
-            if (!params.hasOwnProperty(key)) {
-                continue;
-            }
-            url += '&' + key + '=' + params[key];
-        }
-    }
-
-    response = syncRequest('GET', url, { retry: true });
-
-    if (response.statusCode >= 300) {
-        console.log('[' + cmd + '] Sick Beard server responded with status code', response.statusCode);
-        console.log(params);
-        return false;
-    }
-
-    if (typeof callback === 'function') {
-        try {
-            responseData = JSON.parse(response.getBody().toString()).data;
-        }
-        catch (err) {
-            console.log('[' + cmd + '] Error while parsing Sick Beard response', err);
-            console.log(params);
-            return false;
-        }
-
-        callback(responseData);
-    }
-}
-
-function formatShowNumber (number) {
-    number = parseInt(number);
-    return number < 10 ? '0' + number : number;
 }
 
 hasToSearchEpisode = hasToReplaceLowQuality
@@ -93,7 +48,7 @@ if (hasToReplaceLowQuality) {
 }
 
 function notifySickBeard (tvdbid, season, episode, callback) {
-    sendAPICmd(
+    sendSickBeardAPICmd(
         'episode.setstatus',
         {
             'tvdbid':  tvdbid,
@@ -107,7 +62,7 @@ function notifySickBeard (tvdbid, season, episode, callback) {
 
 // Get show id list
 // ----------------
-sendAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
+sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
     var searchJSON = {};
     for (var showName in showList) {
         if (!showList.hasOwnProperty(showName)) {
@@ -115,7 +70,7 @@ sendAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
         }
         var show = showList[showName];
         (function (tvdbid) {
-            sendAPICmd('show.seasons', { tvdbid: tvdbid }, function (seasonList) {
+            sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, function (seasonList) {
                 for (var seasonNumber in seasonList) {
                     if (!seasonList.hasOwnProperty(seasonNumber)) {
                         continue;
