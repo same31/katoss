@@ -39,7 +39,7 @@ subtitles.search(show, season, episode, languages)
         })
         ||
         subtitleList.some(function (subInfo) {
-            return downloadIfFound(subInfo, subInfo.team === team);
+            return downloadIfFound(subInfo, utils.ripTeamMatchFoundInList([subInfo.team], team));
         })
         ||
         subtitleList.some(function (subInfo) {
