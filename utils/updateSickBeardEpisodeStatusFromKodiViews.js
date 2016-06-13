@@ -31,7 +31,8 @@ sendKodiAPICmd(
                 }
 
                 console.log(showName);
-                var show = showList[showName];
+                var show = showList[showName],
+                    showLogged = false;
                 (function (tvdbid) {
                     sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, function (seasonList) {
                         var seasonNumber;
@@ -39,8 +40,9 @@ sendKodiAPICmd(
                             if (!seasonList.hasOwnProperty(seasonNumber) || !kodiEpisodes[showName][seasonNumber]) {
                                 continue;
                             }
-                            console.log(seasonNumber + ':');
-                            var episodeList = seasonList[seasonNumber],
+
+                            var seasonLogged = false,
+                                episodeList = seasonList[seasonNumber],
                                 episodeNumber,
                                 episodeInfo;
                             for (episodeNumber in episodeList) {
@@ -50,6 +52,8 @@ sendKodiAPICmd(
                                 episodeInfo = episodeList[episodeNumber];
 
                                 if (episodeInfo.status === 'Downloaded') {
+                                    showLogged || (showLogged = true) && console.log(show);
+                                    seasonLogged || (seasonLogged = true) && console.log(seasonNumber + ':');
                                     console.log(episodeNumber);
                                     // 'archived' status is not available in the API anymore...
                                     sendSickBeardAPICmd(
@@ -64,7 +68,7 @@ sendKodiAPICmd(
                                     );
                                 }
                                 else if (!episodeInfo.status) {
-                                    console.log(episodeNumber, 'status not retrieved');
+                                    console.log(show, seasonNumber, episodeNumber, 'status not retrieved');
                                 }
                             }
                         }
