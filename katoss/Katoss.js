@@ -169,6 +169,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     episodeFilename,
                     torrentFilename,
                     torrentRipTeam              = 'UNKNOWN',
+                    torrentRipTeamList          = [],
                     subtitleFilename,
                     subInfo;
 
@@ -183,17 +184,16 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     // Prefer to get the rip team from episode filename
                     // ------------------------------------------------
                     torrentRipTeam = utils.getRipTeam(episodeFilename);
-                    torrentRipTeam === 'UNKNOWN' && (torrentRipTeam = torrentInfo.ripTeam);
-                    if (torrentRipTeam !== 'UNKNOWN') {
-                        torrentRipTeam = utils.formatRipTeam(torrentRipTeam);
-
+                    torrentRipTeam !== 'UNKNOWN' && torrentRipTeamList.push(utils.formatRipTeam(torrentRipTeam));
+                    torrentInfo.ripTeam !== 'UNKNOWN' && torrentRipTeamList.push(utils.formatRipTeam(torrentInfo.ripTeam));
+                    if (torrentRipTeamList.length > 0) {
                         filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
                         if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
                             filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
                         }
 
                         filteredSubDistributionList = filteredSubDistributionList.filter(function (subInfo) {
-                            var ripTeamList = [torrentRipTeam];
+                            var ripTeamList = [].concat(torrentRipTeamList);
                             subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
                             return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
                         }).sort(function (a, b) {
@@ -213,7 +213,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     if (filteredSubDistributionList.length <= 0) {
                         debugInfo && console.log(show, 'S' + season + 'E' + episode);
                         debugInfo && console.log('"' + lang +
-                            '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeam, 'team not found.');
+                            '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeam.join() || 'UNKNOWN', 'team not found.');
                         return false;
                     }
 
