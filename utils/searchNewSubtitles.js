@@ -39,8 +39,7 @@ sendKodiAPICmd(
                 }
 
                 (function (show) {
-                    var languages  = config.showLanguages && config.showLanguages[show.show_name] || config.languages,
-                        showLogged = false;
+                    var languages = config.showLanguages && config.showLanguages[show.show_name] || config.languages;
                     sendSickBeardAPICmd('show.seasons', { tvdbid: show.tvdbid }, function (seasonList) {
                         var seasonNumber;
                         for (seasonNumber in seasonList) {
@@ -48,8 +47,7 @@ sendKodiAPICmd(
                                 continue;
                             }
 
-                            var seasonLogged = false,
-                                episodeList  = seasonList[seasonNumber],
+                            var episodeList = seasonList[seasonNumber],
                                 episodeNumber,
                                 episodeInfo;
                             for (episodeNumber in episodeList) {
@@ -59,9 +57,6 @@ sendKodiAPICmd(
                                 episodeInfo = episodeList[episodeNumber];
 
                                 if (episodeInfo.location && episodeInfo.release_name && (new Date(episodeInfo.airdate)) > minDate) {
-                                    showLogged || (showLogged = true) && console.log(show.show_name);
-                                    seasonLogged || (seasonLogged = true) && console.log(seasonNumber + ':');
-                                    console.log(episodeNumber);
                                     // Check if downloaded subtitles match preferred language
                                     // ======================================================
 
@@ -78,7 +73,7 @@ sendKodiAPICmd(
                                                     neededLangList = [];
 
                                                 for (var i = 0, l = languages.length; i < l; i++) {
-                                                    var lang = languages[l];
+                                                    var lang = languages[i];
                                                     if (subLangList.indexOf(lang.substr(0, 2)) === -1) {
                                                         neededLangList.push(lang);
                                                     }
@@ -88,6 +83,7 @@ sendKodiAPICmd(
                                                 }
 
                                                 if (neededLangList.length > 0) {
+                                                    console.log(show.show_name, seasonNumber, episodeNumber, neededLangList);
                                                     var distribution = utils.getDistribution(episodeInfo.release_name),
                                                         team         = utils.formatRipTeam(utils.getRipTeam(episodeInfo.release_name))
                                                             .replace(/^SICK(BEARD|RAGE)$/, 'UNKNOWN');
