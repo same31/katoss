@@ -56,15 +56,17 @@ sendKodiAPICmd(
                                 }
                                 episodeInfo = episodeList[episodeNumber];
 
-                                if (episodeInfo.location && episodeInfo.release_name && (new Date(episodeInfo.airdate)) > minDate) {
+                                if (episodeInfo.location && (new Date(episodeInfo.airdate)) > minDate) {
                                     // Check if downloaded subtitles match preferred language
                                     // ======================================================
 
                                     // Get episode available sub known lang list
                                     // -----------------------------------------
                                     (function (episodeInfo, seasonNumber, episodeNumber) {
+                                        var releaseName = episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf('.'))
+                                            .substr(episodeInfo.location.lastIndexOf(path.sep) + 1);
                                         find.file(
-                                            new RegExp('^' + utils.escapeRegExpPattern(episodeInfo.release_name) + '\.[a-z]{2}\.srt$'),
+                                            new RegExp('^' + utils.escapeRegExpPattern(releaseName) + '\.[a-z]{2}\.srt$'),
                                             path.resolve(episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf(path.sep))),
                                             function (files) {
                                                 var subLangList    = files && files.length > 0
@@ -84,8 +86,8 @@ sendKodiAPICmd(
 
                                                 if (neededLangList.length > 0) {
                                                     console.log(show.show_name, seasonNumber, episodeNumber, neededLangList);
-                                                    var distribution = utils.getDistribution(episodeInfo.release_name),
-                                                        team         = utils.formatRipTeam(utils.getRipTeam(episodeInfo.release_name))
+                                                    var distribution = utils.getDistribution(releaseName),
+                                                        team         = utils.formatRipTeam(utils.getRipTeam(releaseName))
                                                             .replace(/^SICK(BEARD|RAGE)$/, 'UNKNOWN');
                                                     // Search subtitles for this release
                                                     // ---------------------------------
