@@ -98,13 +98,13 @@ sendKodiAPICmd(
                                                             });
 
                                                             function downloadSubs (subInfo) {
-                                                                console.log(subInfo);
                                                                 subtitles.download(
                                                                     subInfo,
                                                                     episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf('.') + 1) +
                                                                     subInfo.langId.substr(0, 2) + '.srt'
                                                                 ).then(function () {
-                                                                    console.log('Subtitles file downloaded.');
+                                                                    console.log('Subtitles file downloaded :', show.show_name, seasonNumber, episodeNumber,
+                                                                        subInfo.langId, subInfo.provider);
                                                                 });
                                                                 return true;
                                                             }
