@@ -213,13 +213,14 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     if (filteredSubDistributionList.length <= 0) {
                         debugInfo && console.log(show, 'S' + season + 'E' + episode);
                         debugInfo && console.log('"' + lang +
-                            '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeam.join() || 'UNKNOWN', 'team not found.');
+                            '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeamList.join() || 'UNKNOWN', 'team not found.');
                         return false;
                     }
 
                     subInfo = filteredSubDistributionList[0];
 
                     console.log(show, 'S' + season + 'E' + episode);
+
                     console.log('>>>', '[' + torrentInfo.provider + ']', torrentInfo.quality, torrentInfo.distribution, torrentRipTeam);
                     console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
                     console.log(' Torrent:', torrentInfo.title.trim());

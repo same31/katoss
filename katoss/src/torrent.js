@@ -1,14 +1,15 @@
 var config         = require('./../config.json'),
     utils          = require('./utils'),
     syncRequest    = require('sync-request'),
+    queryString    = require('query-string'),
     bencode        = require('bencode-js'),
-    knownProviders = ['extratorrents', 'kickass'],
     providers      = {
         extratorrents: require('./torrentProviders/extratorrents'),
-        kickass:       require('./torrentProviders/kickass')
+        kickass:       require('./torrentProviders/kickass'),
+        rarbg:         require('./torrentProviders/rarbg')
     },
     confProviders  = (config.torrentProviders || ['kickass']).filter(function (provider) {
-        return ~knownProviders.indexOf(provider);
+        return typeof providers[provider] !== 'undefined';
     });
 
 function searchEpisode (show, season, episode) {
@@ -41,13 +42,24 @@ function extractTorrentFilenameAndUrl (torrentInfo) {
 }
 
 function downloadTorrentFileContent (url) {
-    url          = url.trim();
-    var response = syncRequest('GET', url, {
-        followAllRedirects: true,
-        encoding:           'binary',
-        gzip:               true,
-        retry:              true
-    });
+    url         = url.trim();
+    var qs      = queryString.extract(url),
+        options = {
+            headers:            {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
+            },
+            followAllRedirects: true,
+            encoding:           'binary',
+            gzip:               true,
+            retry:              true
+        };
+
+    if (qs) {
+        url        = url.replace('?' + qs, '');
+        options.qs = queryString.parse(qs);
+    }
+
+    var response = syncRequest('GET', url, options);
 
     if (response.statusCode >= 300) {
         console.log('Server responded with status code', response.statusCode, 'while downloading torrent file', url);
