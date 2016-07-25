@@ -1,5 +1,5 @@
 var utils      = require('./../../src/utils'),
-    Torrentapi = require('torrentapi'),
+    Torrentapi = require('rarbgto-api'),
     rarbg      = new Torrentapi('katoss');
 
 function searchEpisode (show, season, episode) {
