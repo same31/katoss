@@ -36,7 +36,6 @@
     "rarbgto-api": "^1.0.2",
     "request": "^2.74.0",
     "sync-request": "^3.0.1",
-    "torrentapi": "^1.0.4",
     "xmlrpc": "^1.3.2"
   },
   "devDependencies": {
