@@ -1,14 +1,14 @@
-var config         = require('./../config.json'),
-    utils          = require('./utils'),
-    syncRequest    = require('sync-request'),
-    queryString    = require('query-string'),
-    bencode        = require('bencode-js'),
-    providers      = {
+var config        = require('./../config.json'),
+    utils         = require('./utils'),
+    syncRequest   = require('sync-request'),
+    queryString   = require('query-string'),
+    bencode       = require('bencode-js'),
+    providers     = {
         extratorrents: require('./torrentProviders/extratorrents'),
         kickass:       require('./torrentProviders/kickass'),
         rarbg:         require('./torrentProviders/rarbg')
     },
-    confProviders  = (config.torrentProviders || ['kickass']).filter(function (provider) {
+    confProviders = (config.torrentProviders || ['kickass']).filter(function (provider) {
         return typeof providers[provider] !== 'undefined';
     });
 
@@ -52,17 +52,23 @@ function downloadTorrentFileContent (url) {
             encoding:           'binary',
             gzip:               true,
             retry:              true
-        };
+        },
+        response;
 
     if (qs) {
         url        = url.replace('?' + qs, '');
         options.qs = queryString.parse(qs);
     }
 
-    var response = syncRequest('GET', url, options);
+    response = syncRequest('GET', url, options);
 
     if (response.statusCode >= 300) {
         console.log('Server responded with status code', response.statusCode, 'while downloading torrent file', url);
+        return false;
+    }
+    else if (response.headers && response.headers['content-type'] !== 'application/x-bittorrent') {
+        console.log(`Torrent content-type does not match application/x-bittorent while downloading torrent url ${url}`);
+        console.log('Headers:', response.headers);
         return false;
     }
 
