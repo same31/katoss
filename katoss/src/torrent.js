@@ -68,7 +68,7 @@ function downloadTorrentFileContent (url) {
     }
     else if (response.headers && response.headers['content-type'] !== 'application/x-bittorrent') {
         console.log(`Torrent content-type does not match application/x-bittorent while downloading torrent url ${url}`);
-        console.log('Headers:', response.headers);
+        console.log('Content-type:', response.headers['content-type']);
         return false;
     }
 

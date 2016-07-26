@@ -21,7 +21,7 @@ function searchEpisode (show, season, episode) {
 
 function extractTorrentFilenameAndUrl (torrentInfo) {
     var filename   = torrentInfo.title + '.torrent',
-        magnetHash = torrentInfo.download.match(/([0-9a-f]{40})/i),
+        magnetHash = torrentInfo.download.match(/[0-9a-f]{40}/i),
         url;
 
     if (magnetHash && magnetHash.length) {
