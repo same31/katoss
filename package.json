@@ -1,6 +1,6 @@
 {
   "name": "katoss",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "KickAss Torrents + Open Subtitles Search, also supports ExtraTorrents & addic7ed subtitles providers",
   "keywords": [
     "kickass",
@@ -33,7 +33,7 @@
     "mkdirp": "^0.5.1",
     "promise": "^7.1.1",
     "query-string": "^4.2.2",
-    "rarbgto-api": "^2.0.1",
+    "rarbgto-api": "^3.0.0",
     "request": "^2.74.0",
     "sync-request": "^3.0.1",
     "xmlrpc": "^1.3.2"
