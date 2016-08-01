@@ -6,7 +6,7 @@
     "ignoredWords":           ["core2hd", "vostfr", "h.265", "h265", "x265", "hevc"],
     "priority":               ["quality", "language", "distribution"],
     "subtitlesProviders":     ["opensubtitles", "addic7ed"],
-    "torrentProviders":       ["kickass", "extratorrents"],
+    "torrentProviders":       ["kickass", "rarbg", "extratorrents"],
     "languages":              ["fre", "eng"],
     "showLanguages":          {
         "Sample TV show title": ["fre"]
