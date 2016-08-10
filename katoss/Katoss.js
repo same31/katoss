@@ -6,6 +6,7 @@ var debugInfo  = ~process.argv.indexOf('--debug'),
     Promise    = require('promise'),
     fs         = require('fs'),
     path       = require('path'),
+    sortBy     = require('lodash.sortby'),
     outputPath = config.outputPath || '.';
 
 function Katoss (tvdbid, show, season, episode, languages, currentQuality, notifyManager) {
@@ -118,30 +119,19 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 criteria = criteria.toLowerCase();
 
                 if (criteria === 'quality') {
-                    return torrentList.sort((a, b) => config.qualityOrder.indexOf(a.quality) - config.qualityOrder.indexOf(b.quality));
+                    return sortBy(torrentList, o => config.qualityOrder.indexOf(o.quality));
                 }
 
                 if (criteria === 'distribution') {
-                    return torrentList.sort((a, b) => config.qualityOrder.indexOf(a.distribution) - config.qualityOrder.indexOf(b.distribution));
+                    return sortBy(torrentList, o => config.distributionOrder.indexOf(o.distribution));
                 }
 
                 if (criteria === 'language') {
-                    return torrentList.sort((a, b) => {
-                        var reducer = (prevLang, lang) => Math.min(languages.indexOf(prevLang), languages.indexOf(lang));
-                        return a.potentialSubLanguages.reduce(reducer) - b.potentialSubLanguages.reduce(reducer);
-                    });
+                    return sortBy(torrentList, o => o.potentialSubLanguages.reduce((prevLang, lang) => Math.min(languages.indexOf(prevLang), languages.indexOf(lang))));
                 }
 
                 if (criteria === 'hevc') {
-                    return torrentList.sort((a, b) => {
-                        if (utils.isHEVC(a.title)) {
-                            return utils.isHEVC(b.title) ? 0 : -1;
-                        }
-                        if (utils.isHEVC(b.title)) {
-                            return 1;
-                        }
-                        return 0;
-                    });
+                    return sortBy(torrentList, o => !utils.isHEVC(o.title));
                 }
 
                 // Unknown criteria
