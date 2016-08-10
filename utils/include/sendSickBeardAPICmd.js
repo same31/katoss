@@ -1,4 +1,4 @@
-var sickBeardConfig      = require('../katoss/config.json').sickBeard,
+var sickBeardConfig      = require('../../katoss/config.json').sickBeard,
     syncRequest = require('sync-request');
 
 function sendSickBeardAPICmd (cmd, params, callback) {

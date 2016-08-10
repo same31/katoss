@@ -1,5 +1,5 @@
-var sendSickBeardAPICmd = require('./sendSickBeardAPICmd'),
-    sendKodiAPICmd      = require('./sendKodiAPICmd');
+var sendSickBeardAPICmd = require('./include/sendSickBeardAPICmd'),
+    sendKodiAPICmd      = require('./include/sendKodiAPICmd');
 
 sendKodiAPICmd(
     'VideoLibrary.GetEpisodes',

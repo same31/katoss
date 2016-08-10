@@ -1,4 +1,4 @@
-var sendKodiAPICmd = require('./sendKodiAPICmd');
+var sendKodiAPICmd = require('./include/sendKodiAPICmd');
 
 module.exports = function cleanKodiVideoLibrary (debug) {
     sendKodiAPICmd('VideoLibrary.Clean', { showdialogs: false });

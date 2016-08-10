@@ -3,8 +3,8 @@ var path                = require('path'),
     config              = require('../katoss/config.json'),
     utils               = require('../katoss/src/utils'),
     subtitles           = require('../katoss/src/subtitles'),
-    sendSickBeardAPICmd = require('./sendSickBeardAPICmd'),
-    sendKodiAPICmd      = require('./sendKodiAPICmd'),
+    sendSickBeardAPICmd = require('./include/sendSickBeardAPICmd'),
+    sendKodiAPICmd      = require('./include/sendKodiAPICmd'),
     minDate             = new Date();
 
 minDate.setMonth(minDate.getMonth() - 6);

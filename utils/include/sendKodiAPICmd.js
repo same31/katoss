@@ -1,5 +1,5 @@
 var request     = require('request'),
-    kodiConfig  = require('../katoss/config.json').kodi || {},
+    kodiConfig  = require('../../katoss/config.json').kodi || {},
     protocol    = kodiConfig.protocol || 'http',
     host        = kodiConfig.host || '127.0.0.1',
     port        = kodiConfig.port || 8080,
