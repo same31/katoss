@@ -23,7 +23,7 @@ sendKodiAPICmd(
 
         // Retrieve all 'downloaded' episodes from SickBeard and check whether they were viewed in Kodi
         // ============================================================================================
-        sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
+        sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, showList => {
             var showName;
             for (showName in showList) {
                 if (!showList.hasOwnProperty(showName) || !kodiEpisodes[showName]) {
@@ -32,8 +32,8 @@ sendKodiAPICmd(
 
                 var show = showList[showName],
                     showLogged = false;
-                (function (tvdbid) {
-                    sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, function (seasonList) {
+                (tvdbid => {
+                    sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, seasonList => {
                         var seasonNumber;
                         for (seasonNumber in seasonList) {
                             if (!seasonList.hasOwnProperty(seasonNumber) || !kodiEpisodes[showName][seasonNumber]) {

@@ -1,21 +1,15 @@
 function allSettled (promiseList) {
-    return new Promise(function (resolve) {
+    return new Promise(resolve => {
         var responseList = [],
             promiseCount = promiseList.length,
-            promiseDone  = function (response, error, index) {
+            promiseDone  = (response, error, index) => {
                 responseList[index] = { response: response, error: error };
-                responseList.filter(function (response) {
-                    return typeof response !== 'undefined';
-                }).length === promiseCount && resolve(responseList);
+                responseList.filter(response => typeof response !== 'undefined').length === promiseCount && resolve(responseList);
             };
 
-        promiseList.forEach(function (promise, index) {
-            promise.then(function (response) {
-                promiseDone(response, null, index);
-            }).catch(function (error) {
-                promiseDone(null, error, index);
-            });
-        });
+        promiseList.forEach((promise, index) => promise
+            .then(response => promiseDone(response, null, index))
+            .catch(error => promiseDone(null, error, index)));
     });
 }
 
@@ -79,7 +73,7 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
         ['ASAP', 'XII', 'IMMERSE', 'FLEET', 'SKGTV'],
         ['FQM', 'ORENJI']
     ];
-    return ripTeamList.some(function (ripTeam) {
+    return ripTeamList.some(ripTeam => {
         if (ripTeam === searchedRipTeam) {
             return true;
         }
@@ -104,9 +98,7 @@ function getReleaseQuality (releaseName) {
 }
 
 function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
-    var qualityPattern = allowedQualityList.filter(function (quality) {
-            return quality.toUpperCase() !== 'UNKNOWN';
-        }).join('|'),
+    var qualityPattern = allowedQualityList.filter(quality => quality.toUpperCase() !== 'UNKNOWN').join('|'),
         match          = releaseName.match(new RegExp(qualityPattern, 'i'));
 
     return match ? match[0].toLowerCase() : 'UNKNOWN';
@@ -155,20 +147,13 @@ var queue = {
         var jobs        = this.jobList.splice(0, this.concurrency);
         this.activeJobs = this.concurrency;
 
-        jobs.forEach(function (job) {
-            setTimeout(function () {
-                job(this.next.bind(this));
-            }.bind(this), 0);
-
-        }.bind(this));
+        jobs.forEach(job => setTimeout(() => job(this.next.bind(this)), 0));
     },
     next:        function () {
         var jobs = this.jobList.splice(0, 1),
             job  = jobs[0];
         if (job) {
-            setTimeout(function () {
-                job(this.next.bind(this));
-            }.bind(this), 0);
+            setTimeout(() => job(this.next.bind(this)), 0);
         }
         else {
             this.activeJobs--;
