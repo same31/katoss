@@ -16,37 +16,25 @@ var movieFile    = process.argv[2],
 console.log(show, season, episode, distribution, team, languages);
 
 subtitles.search(show, season, episode, languages)
-    .then(function (subtitleList) {
-        subtitleList = subtitleList.sort(function (a, b) {
-            return languages.indexOf(a.langId) - languages.indexOf(b.langId);
-        });
+    .then(subtitleList => {
+        subtitleList = subtitleList.sort((a, b) => languages.indexOf(a.langId) - languages.indexOf(b.langId));
 
-        var downloadIfFound = function downloadIfFound (subInfo, search) {
+        function downloadIfFound (subInfo, search) {
             if (search) {
                 console.log(subInfo);
                 subtitles.download(
                     subInfo,
                     movieFile.substr(0, movieFile.lastIndexOf('.') + 1) + subInfo.langId.substr(0, 2) + '.srt'
-                ).then(function () {
-                    console.log('Subtitles file downloaded.');
-                });
+                ).then(() => console.log('Subtitles file downloaded.'));
                 return true;
             }
-        };
+        }
 
-        subtitleList.some(function (subInfo) {
-            return downloadIfFound(subInfo, subInfo.distribution === distribution && utils.ripTeamMatchFoundInList([subInfo.team], team));
-        })
+        subtitleList.some(subInfo => downloadIfFound(subInfo, subInfo.distribution === distribution && utils.ripTeamMatchFoundInList([subInfo.team], team)))
         ||
-        subtitleList.some(function (subInfo) {
-            return downloadIfFound(subInfo, utils.ripTeamMatchFoundInList([subInfo.team], team));
-        })
+        subtitleList.some(subInfo => downloadIfFound(subInfo, utils.ripTeamMatchFoundInList([subInfo.team], team)))
         ||
-        subtitleList.some(function (subInfo) {
-            return downloadIfFound(subInfo, subInfo.distribution === distribution && ~[subInfo.team, team].indexOf('UNKNOWN'));
-        })
+        subtitleList.some(subInfo => downloadIfFound(subInfo, subInfo.distribution === distribution && ~[subInfo.team, team].indexOf('UNKNOWN')))
         ||
-        subtitleList.some(function (subInfo) {
-            return downloadIfFound(subInfo, subInfo.distribution === distribution);
-        });
+        subtitleList.some(subInfo => downloadIfFound(subInfo, subInfo.distribution === distribution));
     });

@@ -8,26 +8,20 @@ var config        = require('./../config.json'),
         kickass:      require('./torrentProviders/kickass'),
         rarbg:        require('./torrentProviders/rarbg')
     },
-    confProviders = (config.torrentProviders || ['extratorrent']).filter(function (provider) {
-        return typeof providers[provider] !== 'undefined';
-    });
+    confProviders = (config.torrentProviders || ['extratorrent']).filter(provider => typeof providers[provider] !== 'undefined');
 
 function searchEpisode (show, season, episode) {
-    return utils.allSettled(
-        confProviders.map(function (provider) {
-            return providers[provider].searchEpisode(show, season, episode);
-        })
-    ).then(function (response) {
-        return response.reduce(function (prevResult, result, index) {
+    return utils.allSettled(confProviders.map(provider => providers[provider].searchEpisode(show, season, episode)))
+        .then(response => response.reduce((prevResult, result, index) => {
             var provider = confProviders[index];
-            return prevResult.concat((result.response || []).filter(torrentInfo => torrentInfo.seeds > 0).map(function (torrentInfo) {
-                torrentInfo.provider = provider;
-                return torrentInfo;
-            }));
-        }, []).sort(function (a, b) {
-            return confProviders.indexOf(a.provider) - confProviders.indexOf(b.provider);
-        });
-    });
+            return prevResult.concat(
+                (result.response || [])
+                    .filter(torrentInfo => torrentInfo.seeds > 0)
+                    .map(torrentInfo => {
+                        torrentInfo.provider = provider;
+                        return torrentInfo;
+                    }));
+        }, []).sort((a, b) => confProviders.indexOf(a.provider) - confProviders.indexOf(b.provider)));
 }
 
 function extractTorrentFilenameAndUrl (torrentInfo) {
@@ -95,10 +89,7 @@ function getTorrentFiles (decodedTorrentContent) {
     if (!decodedTorrentContent.info || !decodedTorrentContent.info.files) {
         return [];
     }
-
-    return decodedTorrentContent.info.files.filter(function (file) {
-        return file.path && file.path.length > 0;
-    });
+    return decodedTorrentContent.info.files.filter(file => file.path && file.path.length > 0);
 }
 
 function getTorrentFilesFilePath (file) {
@@ -110,25 +101,18 @@ function checkEpisodeTorrentContent (decodedTorrentContent) {
 
     // Invalid if there is a .exe file
     // -------------------------------
-    if (files.some(
-            function (file) {
-                return utils.getFileExtension(getTorrentFilesFilePath(file)) === 'exe';
-            })
-    ) {
+    if (files.some(file => utils.getFileExtension(getTorrentFilesFilePath(file)) === 'exe')) {
         return false;
     }
 
     // Valid if there is a movie file with length > 0
     // ----------------------------------------------
-    return files.some(function (file) {
-        var filename = getTorrentFilesFilePath(file);
-        return utils.fileExtensionIsMovie(filename) && parseInt(file.length) > 0;
-    });
+    return files.some(file => utils.fileExtensionIsMovie(getTorrentFilesFilePath(file)) && parseInt(file.length) > 0);
 }
 
 function getEpisodeFilename (decodedTorrentContent) {
     var files = getTorrentFiles(decodedTorrentContent);
-    return files.reduce(function (prevFile, file) {
+    return files.reduce((prevFile, file) => {
         var filename = getTorrentFilesFilePath(file),
             length   = parseInt(file.length);
         if (utils.fileExtensionIsMovie(filename) && length > prevFile.length) {

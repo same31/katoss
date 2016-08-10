@@ -5,7 +5,7 @@ var Katoss     = require('./Katoss'),
     outputPath = config.outputPath || '.';
 
 function search (searchJSON, notifyManager) {
-    mkdirp(outputPath, function (err) {
+    mkdirp(outputPath, err => {
         if (err) {
             return console.log('Cannot create directory ' + outputPath, err);
         }
@@ -33,13 +33,11 @@ function search (searchJSON, notifyManager) {
 
                 episodeList        = showInfo.seasons[season];
                 currentQualityList = showInfo.currentQualities && showInfo.currentQualities[season];
-                episodeList.forEach(function (episode, index) {
+                episodeList.forEach((episode, index) => {
                     var currentQuality = currentQualityList && currentQualityList[index],
                         search         = new Katoss(showInfo.tvdbid, show, season, episode, languages, currentQuality, notifyManager);
 
-                    queue.push(function (cb) {
-                        search.run(cb);
-                    });
+                    queue.push(cb => search.run(cb));
                 });
             }
         }

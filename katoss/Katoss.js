@@ -9,14 +9,14 @@ var debugInfo  = ~process.argv.indexOf('--debug'),
     outputPath = config.outputPath || '.';
 
 function Katoss (tvdbid, show, season, episode, languages, currentQuality, notifyManager) {
-    this.handleError = function (error) {
+    this.handleError = error => {
         console.log(show, 'S' + season + 'E' + episode);
         console.log(error, '\n');
         this.callback && this.callback();
         return Promise.reject(error);
     };
 
-    this.searchSubtitles = function () {
+    this.searchSubtitles = () => {
         return Subtitles.search(show, season, episode, languages).then(subtitleList => {
             debugInfo && console.log('Valid subtitles name list', subtitleList);
 
@@ -26,7 +26,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 return this.handleError('No subtitles found.');
             }
 
-            this.subtitles = subtitleList.reduce(function (subs, subInfo) {
+            this.subtitles = subtitleList.reduce((subs, subInfo) => {
                 var lang         = subInfo.langId,
                     distribution = subInfo.distribution;
 
@@ -40,12 +40,12 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
         });
     };
 
-    this.searchTorrents = function () {
+    this.searchTorrents = () => {
         return Torrent.searchEpisode(show, season, episode).catch(this.handleError).then(torrentList => {
             var priority      = config.priority || ['quality', 'language', 'distribution'],
                 isHevcAllowed = priority.some(criteria => criteria.toLowerCase() === 'hevc');
 
-            this.torrentList = torrentList.filter(function (torrentInfo) {
+            this.torrentList = torrentList.filter(torrentInfo => {
                 var title        = torrentInfo.title.trim(),
                     ignoredWords = config.ignoredWords || [],
                     regIgnoredWords,
@@ -108,35 +108,32 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 torrentInfo.potentialSubLanguages = potentialSubLanguages;
 
                 return true;
-            }, this);
+            });
 
             if (this.torrentList.length <= 0) {
                 return this.handleError('No torrents found.');
             }
 
-            this.torrentList = priority.slice().reverse().reduce(function (torrentList, criteria) {
+            this.torrentList = priority.slice().reverse().reduce((torrentList, criteria) => {
                 criteria = criteria.toLowerCase();
 
                 if (criteria === 'quality') {
-                    return torrentList.sort(function (a, b) {
-                        return config.qualityOrder.indexOf(a.quality) - config.qualityOrder.indexOf(b.quality);
-                    });
+                    return torrentList.sort((a, b) => config.qualityOrder.indexOf(a.quality) - config.qualityOrder.indexOf(b.quality));
                 }
+
                 if (criteria === 'distribution') {
-                    return torrentList.sort(function (a, b) {
-                        return config.qualityOrder.indexOf(a.distribution) - config.qualityOrder.indexOf(b.distribution);
-                    });
+                    return torrentList.sort((a, b) => config.qualityOrder.indexOf(a.distribution) - config.qualityOrder.indexOf(b.distribution));
                 }
+
                 if (criteria === 'language') {
-                    return torrentList.sort(function (a, b) {
-                        var reducer = function (prevLang, lang) {
-                            return Math.min(languages.indexOf(prevLang), languages.indexOf(lang));
-                        };
+                    return torrentList.sort((a, b) => {
+                        var reducer = (prevLang, lang) => Math.min(languages.indexOf(prevLang), languages.indexOf(lang));
                         return a.potentialSubLanguages.reduce(reducer) - b.potentialSubLanguages.reduce(reducer);
                     });
                 }
+
                 if (criteria === 'hevc') {
-                    return torrentList.sort(function (a, b) {
+                    return torrentList.sort((a, b) => {
                         if (utils.isHEVC(a.title)) {
                             return utils.isHEVC(b.title) ? 0 : -1;
                         }
@@ -153,116 +150,114 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
             }, this.torrentList);
 
             if (debugInfo) {
-                this.torrentList.forEach(function (torrentInfo) {
+                this.torrentList.forEach(torrentInfo => {
                     console.log('[' + torrentInfo.provider + ']', torrentInfo.title, '[' + torrentInfo.quality + '][' + torrentInfo.distribution +
-                        '][' + torrentInfo.ripTeam + ']', torrentInfo.potentialSubLanguages);
+                        '][' + torrentInfo.ripTeam + ']', torrentInfo.potentialSubLanguages, utils.isHEVC(torrentInfo.title) ? '[HEVC]' : '');
                 });
             }
         });
     };
 
-    this.downloadMatchingTorrentAndSubtitles = function () {
-        return this.torrentList.some(function (torrentInfo) {
-            return languages.some(function (lang) {
-                if (!~torrentInfo.potentialSubLanguages.indexOf(lang)) {
-                    return false;
-                }
-                var torrentFile                 = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
-                    torrentContent              = Torrent.downloadTorrentFileContent(torrentFile.url),
-                    decodedTorrentContent,
-                    filteredSubDistributionList = [],
-                    episodeFilename,
-                    torrentFilename,
-                    torrentRipTeam              = 'UNKNOWN',
-                    torrentRipTeamList          = [],
-                    subtitleFilename,
-                    subInfo;
+    this.downloadMatchingTorrentAndSubtitles = () => {
+        return this.torrentList.some(torrentInfo => languages.some(lang => {
+            if (!~torrentInfo.potentialSubLanguages.indexOf(lang)) {
+                return false;
+            }
+            var torrentFile                 = Torrent.extractTorrentFilenameAndUrl(torrentInfo),
+                torrentContent              = Torrent.downloadTorrentFileContent(torrentFile.url),
+                decodedTorrentContent,
+                filteredSubDistributionList = [],
+                episodeFilename,
+                torrentFilename,
+                torrentRipTeam              = 'UNKNOWN',
+                torrentRipTeamList          = [],
+                subtitleFilename,
+                subInfo;
 
-                if (!torrentContent || !(decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent))) {
-                    return false;
-                }
+            if (!torrentContent || !(decodedTorrentContent = Torrent.decodeTorrentContent(torrentContent))) {
+                return false;
+            }
 
-                if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
-                    episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
-                    torrentFilename = path.join(outputPath, torrentFile.filename.trim());
+            if (Torrent.checkEpisodeTorrentContent(decodedTorrentContent)) {
+                episodeFilename = Torrent.getEpisodeFilename(decodedTorrentContent);
+                torrentFilename = path.join(outputPath, torrentFile.filename.trim());
 
-                    // Prefer to get the rip team from episode filename
-                    // ------------------------------------------------
-                    torrentRipTeam = utils.getRipTeam(episodeFilename);
-                    torrentRipTeam !== 'UNKNOWN' && torrentRipTeamList.push(utils.formatRipTeam(torrentRipTeam));
-                    torrentInfo.ripTeam !== 'UNKNOWN' && torrentRipTeamList.push(utils.formatRipTeam(torrentInfo.ripTeam));
-                    if (torrentRipTeamList.length > 0) {
-                        filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
-                        if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
-                            filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
+                // Prefer to get the rip team from episode filename
+                // ------------------------------------------------
+                torrentRipTeam = utils.getRipTeam(episodeFilename);
+                torrentRipTeam !== 'UNKNOWN' && torrentRipTeamList.push(utils.formatRipTeam(torrentRipTeam));
+                torrentInfo.ripTeam !== 'UNKNOWN' && torrentRipTeamList.push(utils.formatRipTeam(torrentInfo.ripTeam));
+                if (torrentRipTeamList.length > 0) {
+                    filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
+                    if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
+                        filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
+                    }
+
+                    filteredSubDistributionList = filteredSubDistributionList.filter(subInfo => {
+                        var ripTeamList = [].concat(torrentRipTeamList);
+                        subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
+                        return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
+                    }).sort((a, b) => {
+                        if (a.team === b.team) {
+                            return 0;
                         }
-
-                        filteredSubDistributionList = filteredSubDistributionList.filter(function (subInfo) {
-                            var ripTeamList = [].concat(torrentRipTeamList);
-                            subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
-                            return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
-                        }).sort(function (a, b) {
-                            if (a.team === b.team) {
-                                return 0;
-                            }
-                            if (a.team === 'UNKNOWN') {
-                                return 1;
-                            }
-                            return -1;
-                        });
-                    }
-                    else if (torrentInfo.distribution !== 'UNKNOWN') {
-                        filteredSubDistributionList = this.subtitles[lang][torrentInfo.distribution] || [];
-                    }
-
-                    if (filteredSubDistributionList.length <= 0) {
-                        debugInfo && console.log(show, 'S' + season + 'E' + episode);
-                        debugInfo && console.log('"' + lang +
-                            '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeamList.join() || 'UNKNOWN', 'team not found.');
-                        return false;
-                    }
-
-                    subInfo = filteredSubDistributionList[0];
-
-                    console.log(show, 'S' + season + 'E' + episode);
-
-                    console.log('>>>', '[' + torrentInfo.provider + ']', torrentInfo.quality, torrentInfo.distribution, torrentRipTeam);
-                    console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
-                    console.log(' Torrent:', torrentInfo.title.trim());
-                    console.log(' Episode filename:', episodeFilename.trim());
-                    console.log(' Sub: %s\n', subInfo.SubFileName &&
-                        subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version);
-
-                    subtitleFilename = path.join(outputPath,
-                        episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
-
-                    // 1. Download & write subtitles file
-                    // 2. Write torrent file (.torrent.tmp)
-                    // 3. Notify manager (Sick Beard)
-                    // 4. Rename .torrent.tmp file to .torrent
-                    // =======================================
-                    ((torrentFilename, torrentContent) => {
-                        Subtitles.download(subInfo, subtitleFilename).then(() => {
-                            var hasToNotifyManager = notifyManager && tvdbid;
-
-                            fs.writeFile(torrentFilename +
-                                (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager ?
-                                () => {
-                                    notifyManager(tvdbid, season, episode, () => {
-                                        fs.rename(torrentFilename + '.tmp', torrentFilename);
-                                        this.callback();
-                                    });
-                                } : this.callback);
-                        });
-                    })(torrentFilename, torrentContent);
-
-                    return true;
+                        if (a.team === 'UNKNOWN') {
+                            return 1;
+                        }
+                        return -1;
+                    });
                 }
-            }, this);
-        }, this);
+                else if (torrentInfo.distribution !== 'UNKNOWN') {
+                    filteredSubDistributionList = this.subtitles[lang][torrentInfo.distribution] || [];
+                }
+
+                if (filteredSubDistributionList.length <= 0) {
+                    debugInfo && console.log(show, 'S' + season + 'E' + episode);
+                    debugInfo && console.log('"' + lang +
+                        '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeamList.join() || 'UNKNOWN', 'team not found.');
+                    return false;
+                }
+
+                subInfo = filteredSubDistributionList[0];
+
+                console.log(show, 'S' + season + 'E' + episode);
+
+                console.log('>>>', '[' + torrentInfo.provider + ']', torrentInfo.quality, torrentInfo.distribution, torrentRipTeam);
+                console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
+                console.log(' Torrent:', torrentInfo.title.trim());
+                console.log(' Episode filename:', episodeFilename.trim());
+                console.log(' Sub: %s\n', subInfo.SubFileName &&
+                    subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version);
+
+                subtitleFilename = path.join(outputPath,
+                    episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
+
+                // 1. Download & write subtitles file
+                // 2. Write torrent file (.torrent.tmp)
+                // 3. Notify manager (Sick Beard)
+                // 4. Rename .torrent.tmp file to .torrent
+                // =======================================
+                ((torrentFilename, torrentContent) => {
+                    Subtitles.download(subInfo, subtitleFilename).then(() => {
+                        var hasToNotifyManager = notifyManager && tvdbid;
+
+                        fs.writeFile(torrentFilename +
+                            (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager ?
+                            () => {
+                                notifyManager(tvdbid, season, episode, () => {
+                                    fs.rename(torrentFilename + '.tmp', torrentFilename);
+                                    this.callback();
+                                });
+                            } : this.callback);
+                    });
+                })(torrentFilename, torrentContent);
+
+                return true;
+            }
+        }));
     };
 
-    this.run = function (callback) {
+    this.run = callback => {
         this.callback = callback;
 
         this.searchSubtitles()

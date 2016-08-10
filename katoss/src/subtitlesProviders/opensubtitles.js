@@ -14,8 +14,8 @@ var config  = require('./../../config.json'),
 
 function login () {
     if (!_loginPromise) {
-        _loginPromise = new Promise(function (resolve, reject) {
-            client.methodCall('LogIn', ['', '', 'fr', config.openSubtitlesUserAgent], function (err, response) {
+        _loginPromise = new Promise((resolve, reject) => {
+            client.methodCall('LogIn', ['', '', 'fr', config.openSubtitlesUserAgent], (err, response) => {
                 if (err) {
                     console.log('[LogIn] OpenSubtitles connection problem', err);
                     return reject(err);
@@ -31,22 +31,21 @@ function login () {
 }
 
 function search (show, season, episode, languages) {
-    return login().then(function () {
-        return new Promise(function (resolve, reject) {
-            client.methodCall('SearchSubtitles', [_token, [{
-                'sublanguageid': languages.join(),
-                'query':         show,
-                'season':        parseInt(season),
-                'episode':       parseInt(episode)
-            }]], function (err, response) {
-                if (err || !response.data) {
-                    return reject('[SearchSubtitles] OpenSubtitles connection problem', err, response);
-                }
+    return login().then(() => new Promise((resolve, reject) => {
+        client.methodCall('SearchSubtitles', [_token, [{
+            'sublanguageid': languages.join(),
+            'query':         show,
+            'season':        parseInt(season),
+            'episode':       parseInt(episode)
+        }]], (err, response) => {
+            if (err || !response.data) {
+                return reject('[SearchSubtitles] OpenSubtitles connection problem', err, response);
+            }
 
-                var formattedShowTitle = utils.formatShowTitle(show),
-                    subs               = response.data.filter(function (subInfo) {
-                        return utils.releaseNameIsValid(subInfo.SubFileName, show, season, episode);
-                    }).map(function (subInfo) {
+            var formattedShowTitle = utils.formatShowTitle(show),
+                subs               = response.data
+                    .filter(subInfo => utils.releaseNameIsValid(subInfo.SubFileName, show, season, episode))
+                    .map(subInfo => {
                         subInfo.distribution = utils.getDistribution(subInfo.SubFileName);
                         subInfo.distribution === 'UNKNOWN' && (subInfo.distribution = utils.getDistribution(subInfo.MovieReleaseName));
                         subInfo.langId = subInfo.SubLanguageID;
@@ -55,38 +54,33 @@ function search (show, season, episode, languages) {
                         return subInfo;
                     });
 
-                if (formattedShowTitle === show) {
-                    resolve(subs);
-                }
-                else {
-                    return search(formattedShowTitle, season, episode, languages).then(function (subtitlesList) {
-                        resolve(subs.concat(subtitlesList));
-                    });
-                }
-            });
+            if (formattedShowTitle === show) {
+                resolve(subs);
+            }
+            else {
+                return search(formattedShowTitle, season, episode, languages).then(subtitlesList => resolve(subs.concat(subtitlesList)));
+            }
         });
-    });
+    }));
 }
 
 function download (subInfo, filename) {
-    return login().then(function () {
-        return new Promise(function (resolve, reject) {
-            client.methodCall('DownloadSubtitles', [_token, [subInfo.IDSubtitleFile]], function (err, response) {
-                if (err || !response || !response.data || !response.data[0] || !response.data[0].data) {
-                    console.log('[DownloadSubtitles] OpenSubtitles connection problem', err, response);
+    return login().then(() => new Promise((resolve, reject) => {
+        client.methodCall('DownloadSubtitles', [_token, [subInfo.IDSubtitleFile]], (err, response) => {
+            if (err || !response || !response.data || !response.data[0] || !response.data[0].data) {
+                console.log('[DownloadSubtitles] OpenSubtitles connection problem', err, response);
+                return reject(err);
+            }
+
+            zlib.unzip(new Buffer(response.data[0].data, 'base64'), (err, buffer) => {
+                if (err) {
+                    console.log('Error with subtitles unzip', err);
                     return reject(err);
                 }
-
-                zlib.unzip(new Buffer(response.data[0].data, 'base64'), function (err, buffer) {
-                    if (err) {
-                        console.log('Error with subtitles unzip', err);
-                        return reject(err);
-                    }
-                    fs.writeFile(filename.trim(), buffer, resolve);
-                });
+                fs.writeFile(filename.trim(), buffer, resolve);
             });
         });
-    });
+    }));
 }
 
 module.exports = {

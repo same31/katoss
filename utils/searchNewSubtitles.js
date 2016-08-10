@@ -31,16 +31,16 @@ sendKodiAPICmd(
 
         // Retrieve all 'downloaded' episodes from SickBeard and check whether they were not viewed in Kodi
         // ================================================================================================
-        sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
+        sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, showList => {
             var showName;
             for (showName in showList) {
                 if (!showList.hasOwnProperty(showName) || !kodiEpisodes[showName]) {
                     continue;
                 }
 
-                (function (show) {
+                (show => {
                     var languages = config.showLanguages && config.showLanguages[show.show_name] || config.languages;
-                    sendSickBeardAPICmd('show.seasons', { tvdbid: show.tvdbid }, function (seasonList) {
+                    sendSickBeardAPICmd('show.seasons', { tvdbid: show.tvdbid }, seasonList => {
                         var seasonNumber;
                         for (seasonNumber in seasonList) {
                             if (!seasonList.hasOwnProperty(seasonNumber) || !kodiEpisodes[show.show_name][seasonNumber]) {
@@ -62,13 +62,13 @@ sendKodiAPICmd(
 
                                     // Get episode available sub known lang list
                                     // -----------------------------------------
-                                    (function (episodeInfo, seasonNumber, episodeNumber) {
+                                    ((episodeInfo, seasonNumber, episodeNumber) => {
                                         var releaseName = episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf('.'))
                                             .substr(episodeInfo.location.lastIndexOf(path.sep) + 1);
                                         find.file(
                                             new RegExp('^' + utils.escapeRegExpPattern(releaseName) + '\.[a-z]{2}\.srt$'),
                                             path.resolve(episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf(path.sep))),
-                                            function (files) {
+                                            files => {
                                                 var subLangList    = files && files.length > 0
                                                         ? files.map(file => file.match(/(..)\.srt$/)[1])
                                                         : [],
@@ -92,37 +92,33 @@ sendKodiAPICmd(
                                                     // Search subtitles for this release
                                                     // ---------------------------------
                                                     subtitles.search(show.show_name, seasonNumber, episodeNumber, neededLangList)
-                                                        .then(function (subtitleList) {
-                                                            subtitleList = subtitleList.sort(function (a, b) {
-                                                                return neededLangList.indexOf(a.langId) - neededLangList.indexOf(b.langId);
-                                                            });
+                                                        .then(subtitleList => {
+                                                            subtitleList = subtitleList.sort(
+                                                                (a, b) => neededLangList.indexOf(a.langId) - neededLangList.indexOf(b.langId)
+                                                            );
 
                                                             function downloadSubs (subInfo) {
                                                                 subtitles.download(
                                                                     subInfo,
                                                                     episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf('.') + 1) +
                                                                     subInfo.langId.substr(0, 2) + '.srt'
-                                                                ).then(function () {
-                                                                    console.log('Subtitles file downloaded :', show.show_name, seasonNumber, episodeNumber,
-                                                                        subInfo.langId, subInfo.provider);
-                                                                });
+                                                                ).then(() => console.log('Subtitles file downloaded :', show.show_name, seasonNumber, episodeNumber,
+                                                                    subInfo.langId, subInfo.provider));
                                                                 return true;
                                                             }
 
                                                             team === 'UNKNOWN'
                                                                 ?
-                                                                subtitleList.some(function (subInfo) {
-                                                                    return subInfo.distribution === distribution && downloadSubs(subInfo);
-                                                                })
+                                                                subtitleList.some(subInfo => subInfo.distribution === distribution && downloadSubs(subInfo))
                                                                 : (
-                                                            subtitleList.some(function (subInfo) {
-                                                                return subInfo.distribution === distribution && utils.ripTeamMatchFoundInList([subInfo.team], team) &&
-                                                                    downloadSubs(subInfo);
-                                                            })
-                                                            ||
-                                                            subtitleList.some(function (subInfo) {
-                                                                return utils.ripTeamMatchFoundInList([subInfo.team], team) && downloadSubs(subInfo);
-                                                            }));
+                                                                subtitleList.some(
+                                                                    subInfo => subInfo.distribution === distribution &&
+                                                                    utils.ripTeamMatchFoundInList([subInfo.team], team) &&
+                                                                    downloadSubs(subInfo)
+                                                                )
+                                                                ||
+                                                                subtitleList.some(subInfo => utils.ripTeamMatchFoundInList([subInfo.team], team) && downloadSubs(subInfo))
+                                                            );
                                                         });
 
                                                 }

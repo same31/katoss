@@ -20,25 +20,17 @@ if (hasToReplaceLowQuality) {
 }
 
 hasToSearchEpisode = hasToReplaceLowQuality
-    ?
-    function (episodeInfo) {
-        return episodeInfo.status === 'Downloaded' &&
-            episodeInfo.quality.indexOf(maxQuality) === -1 &&
-            (new Date(episodeInfo.airdate)) > minDate;
-    }
-    :
-    function (episodeInfo) {
-        return episodeInfo.status === 'Wanted';
-    };
+    ? episodeInfo => episodeInfo.status === 'Downloaded' && episodeInfo.quality.indexOf(maxQuality) === -1 && (new Date(episodeInfo.airdate)) > minDate
+    : episodeInfo => episodeInfo.status === 'Wanted';
 
-addEpisodeToSearch = function (searchJSONShow, seasonNumber, episodeNumber) {
+addEpisodeToSearch = (searchJSONShow, seasonNumber, episodeNumber) => {
     searchJSONShow.seasons[seasonNumber] || (searchJSONShow.seasons[seasonNumber] = []);
     searchJSONShow.seasons[seasonNumber].push(episodeNumber);
 };
 
 if (hasToReplaceLowQuality) {
     var originalAddEpisodeToSearch = addEpisodeToSearch;
-    addEpisodeToSearch             = function (searchJSONShow, seasonNumber, episodeNumber, currentQuality) {
+    addEpisodeToSearch             = (searchJSONShow, seasonNumber, episodeNumber, currentQuality) => {
         originalAddEpisodeToSearch(searchJSONShow, seasonNumber, episodeNumber);
 
         searchJSONShow.currentQualities || (searchJSONShow.currentQualities = {});
@@ -62,15 +54,15 @@ function notifySickBeard (tvdbid, season, episode, callback) {
 
 // Get show id list
 // ----------------
-sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, function (showList) {
+sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, showList => {
     var searchJSON = {};
     for (var showName in showList) {
         if (!showList.hasOwnProperty(showName)) {
             continue;
         }
         var show = showList[showName];
-        (function (tvdbid) {
-            sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, function (seasonList) {
+        (tvdbid => {
+            sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, seasonList => {
                 for (var seasonNumber in seasonList) {
                     if (!seasonList.hasOwnProperty(seasonNumber)) {
                         continue;
