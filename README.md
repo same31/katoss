@@ -47,7 +47,7 @@ See the _katoss/sampleConfig.json_ for a sample configuration file.
 + **subtitlesProviders**: _(optional)_ The list of supported subtitles databases, ordered by preference. Valid values are _opensubtitles_ and _addic7ed_.
 The default value is _opensubtitles_.
 + **torrentProviders**: _(optional)_ The list of supported torrent platforms, ordered by preference. Valid values are ~~_kickass_~~, _extratorrent_ and _rarbg_.
-The default value is _extratorrent_
+The default value is _extratorrent_.
 + **openSubtitlesUserAgent**: _(optional)_ Your personal Open Subtitles user agent string, required if _opensubtitles_ is in your list of subtitles providers,
 see [How to request a new user agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).
 + **outputPath**: _(optional)_ The path where to downloads torrent and subtitles files, default is directory from where the script is launched.
@@ -58,7 +58,7 @@ Valid values are _BluRay_, _WEB-DL_, _HDTV_ and _unknown_.
 + **priority**: _(optional)_ Torrent results will be ordered by this priority list. Valid values are _quality_, _language_, _distribution_ and _HEVC_.
 Use the last option to include x265 HEVC releases.
 The default priority list is _quality_, _language_, _distribution_. That means release quality will prevail over preferred subtitles language found which will also
-prevails over the preferred release distribution.
+prevails over the preferred release distribution and x265 HEVC releases will be ignored.
 + **ignoredWords**: _(optional)_ Torrent releases containing a word in this list will be ignored.
 Note: To ignore x265 HEVC releases, you have to exclude _HEVC_ option from _priority_ config key.
 + **languages**: Subtitles language(s) to search (3 characters code), ordered by preference. Example: `["fre", "eng"]`.
