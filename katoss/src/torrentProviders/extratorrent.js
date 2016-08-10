@@ -1,8 +1,8 @@
-var utils         = require('./../../src/utils'),
-    extratorrents = require('extratorrentapi');
+var utils        = require('./../../src/utils'),
+    extratorrent = require('extratorrentapi');
 
 function searchEpisode (show, season, episode) {
-    return extratorrents.search(utils.formatShowTitle(show) + ' S' + season + 'E' + episode)
+    return extratorrent.search(utils.formatShowTitle(show) + ' S' + season + 'E' + episode)
         .then(function (torrentList) {
             return torrentList.sort(function (a, b) {
                 return parseInt(b.seeds) - parseInt(a.seeds);

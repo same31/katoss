@@ -1,10 +1,10 @@
 {
   "name": "katoss",
   "version": "1.7.0",
-  "description": "KickAss Torrents + Open Subtitles Search, also supports Rarbg torrents, ExtraTorrents & addic7ed subtitles providers",
+  "description": "KickAss Torrents + Open Subtitles Search, also supports Rarbg torrents, Extratorrent & addic7ed subtitles providers",
   "keywords": [
     "kickass",
-    "extratorrents",
+    "extratorrent",
     "rarbg",
     "torrent",
     "opensubtitles",

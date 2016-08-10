@@ -4,11 +4,11 @@ var config        = require('./../config.json'),
     queryString   = require('query-string'),
     bencode       = require('bencode-js'),
     providers     = {
-        extratorrents: require('./torrentProviders/extratorrents'),
-        kickass:       require('./torrentProviders/kickass'),
-        rarbg:         require('./torrentProviders/rarbg')
+        extratorrent: require('./torrentProviders/extratorrent'),
+        kickass:      require('./torrentProviders/kickass'),
+        rarbg:        require('./torrentProviders/rarbg')
     },
-    confProviders = (config.torrentProviders || ['extratorrents']).filter(function (provider) {
+    confProviders = (config.torrentProviders || ['extratorrent']).filter(function (provider) {
         return typeof providers[provider] !== 'undefined';
     });
 
