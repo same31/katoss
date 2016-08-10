@@ -17,7 +17,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
     };
 
     this.searchSubtitles = function () {
-        return Subtitles.search(show, season, episode, languages).then(function (subtitleList) {
+        return Subtitles.search(show, season, episode, languages).then(subtitleList => {
             debugInfo && console.log('Valid subtitles name list', subtitleList);
 
             this.subtitles = {};
@@ -37,12 +37,14 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
 
                 return subs;
             }, this.subtitles);
-        }.bind(this));
+        });
     };
 
     this.searchTorrents = function () {
-        return Torrent.searchEpisode(show, season, episode).catch(this.handleError).then(function (torrentList) {
-            var priority     = config.priority || ['quality', 'language', 'distribution'];
+        return Torrent.searchEpisode(show, season, episode).catch(this.handleError).then(torrentList => {
+            var priority      = config.priority || ['quality', 'language', 'distribution'],
+                isHevcAllowed = priority.some(criteria => criteria.toLowerCase() === 'hevc');
+
             this.torrentList = torrentList.filter(function (torrentInfo) {
                 var title        = torrentInfo.title.trim(),
                     ignoredWords = config.ignoredWords || [],
@@ -60,18 +62,23 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     }
                 }
 
+                if (!isHevcAllowed && utils.isHEVC(title)) {
+                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => is HEVC');
+                    return false;
+                }
+
                 if (!utils.releaseNameIsValid(title, show, season, episode)) {
                     debugInfo && console.log('[IGNORED TORRENT]', title, ' => has invalid release name');
                     return false;
                 }
 
-                quality = utils.getReleaseQuality(torrentInfo.title);
+                quality = utils.getReleaseQuality(title);
                 if (!~config.qualityOrder.indexOf(quality) || !utils.qualityIsHigherThanCurrent(quality, currentQuality, config.qualityOrder)) {
                     debugInfo && console.log('[IGNORED TORRENT]', title, ' => quality', quality, 'is not good enough');
                     return false;
                 }
 
-                distribution = utils.getDistribution(torrentInfo.title);
+                distribution = utils.getDistribution(title);
                 if (!~config.distributionOrder.indexOf(distribution)) {
                     debugInfo && console.log('[IGNORED TORRENT]', title, ' => distribution', distribution, 'not found');
                     return false;
@@ -94,9 +101,10 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     return false;
                 }
 
+                torrentInfo.title                 = title;
                 torrentInfo.quality               = quality;
-                torrentInfo.distribution          = utils.getDistribution(torrentInfo.title);
-                torrentInfo.ripTeam               = utils.getRipTeam(torrentInfo.title);
+                torrentInfo.distribution          = distribution;
+                torrentInfo.ripTeam               = utils.getRipTeam(title);
                 torrentInfo.potentialSubLanguages = potentialSubLanguages;
 
                 return true;
@@ -129,13 +137,10 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                 }
                 if (criteria === 'hevc') {
                     return torrentList.sort(function (a, b) {
-                        var regexp   = /(h|x).?265|HEVC/i,
-                            foundInA = regexp.test(a.title),
-                            foundInB = regexp.test(b.title);
-                        if (foundInA) {
-                            return foundInB ? 0 : -1;
+                        if (utils.isHEVC(a.title)) {
+                            return utils.isHEVC(b.title) ? 0 : -1;
                         }
-                        if (foundInB) {
+                        if (utils.isHEVC(b.title)) {
                             return 1;
                         }
                         return 0;
@@ -153,7 +158,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                         '][' + torrentInfo.ripTeam + ']', torrentInfo.potentialSubLanguages);
                 });
             }
-        }.bind(this));
+        });
     };
 
     this.downloadMatchingTorrentAndSubtitles = function () {
@@ -236,20 +241,20 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                     // 3. Notify manager (Sick Beard)
                     // 4. Rename .torrent.tmp file to .torrent
                     // =======================================
-                    (function (torrentFilename, torrentContent) {
-                        Subtitles.download(subInfo, subtitleFilename).then(function () {
+                    ((torrentFilename, torrentContent) => {
+                        Subtitles.download(subInfo, subtitleFilename).then(() => {
                             var hasToNotifyManager = notifyManager && tvdbid;
 
                             fs.writeFile(torrentFilename +
                                 (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager ?
-                                function () {
-                                    notifyManager(tvdbid, season, episode, function () {
+                                () => {
+                                    notifyManager(tvdbid, season, episode, () => {
                                         fs.rename(torrentFilename + '.tmp', torrentFilename);
                                         this.callback();
-                                    }.bind(this));
-                                }.bind(this) : this.callback);
-                        }.bind(this));
-                    }.bind(this))(torrentFilename, torrentContent);
+                                    });
+                                } : this.callback);
+                        });
+                    })(torrentFilename, torrentContent);
 
                     return true;
                 }
@@ -261,12 +266,10 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
         this.callback = callback;
 
         this.searchSubtitles()
-            .then(function () {
-                return this.searchTorrents();
-            }.bind(this))
-            .then(function () {
+            .then(this.searchTorrents)
+            .then(() => {
                 this.downloadMatchingTorrentAndSubtitles() || this.handleError('No match found between subtitles and torrents.');
-            }.bind(this));
+            });
     };
 }
 

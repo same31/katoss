@@ -1,12 +1,12 @@
 {
     "openSubtitlesUserAgent": "OSTestUserAgent",
     "outputPath":             "downloads",
-    "qualityOrder":           ["1080p", "720p", "480p", "UNKNOWN"],
+    "qualityOrder":           ["2160p", "1080p", "720p", "480p", "UNKNOWN"],
     "distributionOrder":      ["BLURAY", "WEB-DL", "HDTV", "UNKNOWN"],
-    "ignoredWords":           ["core2hd", "vostfr", "h.265", "h265", "x265", "hevc"],
-    "priority":               ["quality", "language", "distribution"],
+    "priority":               ["quality", "HEVC", "language", "distribution"],
+    "ignoredWords":           ["core2hd", "vostfr"],
     "subtitlesProviders":     ["opensubtitles", "addic7ed"],
-    "torrentProviders":       ["kickass", "rarbg", "extratorrents"],
+    "torrentProviders":       ["rarbg", "extratorrents"],
     "languages":              ["fre", "eng"],
     "showLanguages":          {
         "Sample TV show title": ["fre"]

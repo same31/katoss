@@ -8,7 +8,7 @@ var config        = require('./../config.json'),
         kickass:       require('./torrentProviders/kickass'),
         rarbg:         require('./torrentProviders/rarbg')
     },
-    confProviders = (config.torrentProviders || ['kickass']).filter(function (provider) {
+    confProviders = (config.torrentProviders || ['extratorrents']).filter(function (provider) {
         return typeof providers[provider] !== 'undefined';
     });
 

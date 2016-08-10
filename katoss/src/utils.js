@@ -139,6 +139,10 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
     return foundQualityIndex !== -1 && foundQualityIndex < allowedQualityList.indexOf(currentQuality);
 }
 
+function isHEVC (title) {
+    return /(h|x).?265|HEVC/i.test(title);
+}
+
 var queue = {
     jobList:     [],
     concurrency: 5,
@@ -191,5 +195,6 @@ module.exports = {
     getReleaseQualityFromAllowed: getReleaseQualityFromAllowed,
     releaseNameIsValid:           releaseNameIsValid,
     qualityIsHigherThanCurrent:   qualityIsHigherThanCurrent,
+    isHEVC:                       isHEVC,
     queue:                        queue
 };
