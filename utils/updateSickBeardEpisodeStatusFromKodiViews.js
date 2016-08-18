@@ -30,11 +30,11 @@ sendKodiAPICmd(
                     continue;
                 }
 
-                var show = showList[showName],
-                    showLogged = false;
-                (tvdbid => {
+                var show = showList[showName];
+                ((tvdbid, showName) => {
                     sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }).then(seasonList => {
-                        var seasonNumber;
+                        var showLogged = false,
+                            seasonNumber;
                         for (seasonNumber in seasonList) {
                             if (!seasonList.hasOwnProperty(seasonNumber) || !kodiEpisodes[showName][seasonNumber]) {
                                 continue;
@@ -72,7 +72,7 @@ sendKodiAPICmd(
                             }
                         }
                     });
-                })(show.tvdbid);
+                })(show.tvdbid, showName);
             }
         });
     });
