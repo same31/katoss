@@ -31,16 +31,14 @@ module.exports = function sendSickBeardAPICmd (cmd, params) {
             return false;
         }
 
-        if (typeof callback === 'function') {
-            var responseData = response.body && response.body.data;
-            if (responseData) {
-                return responseData;
-            }
-            else {
-                console.log('[' + cmd + '] Error with Sick Beard response');
-                console.log(params);
-                return false;
-            }
+        var responseData = response.body && response.body.data;
+        if (responseData) {
+            return responseData;
+        }
+        else {
+            console.log('[' + cmd + '] Error with Sick Beard response');
+            console.log(params);
+            return false;
         }
     });
 };
