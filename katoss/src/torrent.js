@@ -1,14 +1,14 @@
-var config        = require('./../config.json'),
-    utils         = require('./utils'),
-    syncRequest   = require('sync-request'),
-    queryString   = require('query-string'),
-    bencode       = require('bencode-js'),
-    providers     = {
+var config         = require('./../config.json'),
+    utils          = require('./utils'),
+    requestPromise = require('request-promise-native'),
+    queryString    = require('query-string'),
+    bencode        = require('bencode-js'),
+    providers      = {
         extratorrent: require('./torrentProviders/extratorrent'),
         kickass:      require('./torrentProviders/kickass'),
         rarbg:        require('./torrentProviders/rarbg')
     },
-    confProviders = (config.torrentProviders || ['extratorrent']).filter(provider => typeof providers[provider] !== 'undefined');
+    confProviders  = (config.torrentProviders || ['extratorrent']).filter(provider => typeof providers[provider] !== 'undefined');
 
 function searchEpisode (show, season, episode) {
     return utils.allSettled(confProviders.map(provider => providers[provider].searchEpisode(show, season, episode)))
@@ -39,34 +39,36 @@ function downloadTorrentFileContent (url) {
     url         = url.trim();
     var qs      = queryString.extract(url),
         options = {
-            headers:            {
+            headers:                 {
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:42.0) Gecko/20100101 Firefox/42.0'
             },
-            followAllRedirects: true,
-            encoding:           'binary',
-            gzip:               true,
-            retry:              true
-        },
-        response;
+            resolveWithFullResponse: true,
+            followAllRedirects:      true,
+            encoding:                'binary',
+            gzip:                    true,
+            retry:                   true
+        };
 
     if (qs) {
         url        = url.replace('?' + qs, '');
         options.qs = queryString.parse(qs);
     }
 
-    response = syncRequest('GET', url, options);
+    options.url = url;
 
-    if (response.statusCode >= 300) {
-        console.log('Server responded with status code', response.statusCode, 'while downloading torrent file', url);
-        return false;
-    }
-    else if (response.headers && response.headers['content-type'] !== 'application/x-bittorrent') {
-        console.log(`Torrent content-type does not match application/x-bittorent while downloading torrent url ${url}`);
-        console.log('Content-type:', response.headers['content-type']);
-        return false;
-    }
+    return requestPromise(options).then(response => {
+        if (response.statusCode >= 300) {
+            console.log('Server responded with status code', response.statusCode, 'while downloading torrent file', url);
+            return false;
+        }
+        else if (response.headers && response.headers['content-type'] !== 'application/x-bittorrent') {
+            console.log(`Torrent content-type does not match application/x-bittorent while downloading torrent url ${url}`);
+            console.log('Content-type:', response.headers['content-type']);
+            return false;
+        }
 
-    return response.getBody('binary').toString();
+        return response.body;
+    });
 }
 
 function decodeTorrentContent (torrentContent) {

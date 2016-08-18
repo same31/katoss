@@ -13,6 +13,16 @@ function allSettled (promiseList) {
     });
 }
 
+function someSeries (list, validator) {
+    return new Promise(resolve => {
+        var i = 0,
+            l = list.length;
+        (function _validator () {
+            i < l ? validator(list[i++]).then(found => found ? resolve(true) : _validator()).catch(_validator) : resolve(false);
+        })();
+    });
+}
+
 function escapeRegExpPattern (string) {
     return string.replace(/[()<>[{\\|^$.*+?]/g, '\\$&');
 }
@@ -166,6 +176,7 @@ var queue = {
 
 module.exports = {
     allSettled:                   allSettled,
+    someSeries:                   someSeries,
     escapeRegExpPattern:          escapeRegExpPattern,
     getLocationOrigin:            getLocationOrigin,
     getFileExtension:             getFileExtension,
