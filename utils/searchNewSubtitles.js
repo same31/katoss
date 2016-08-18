@@ -5,6 +5,8 @@ var path                = require('path'),
     subtitles           = require('../katoss/src/subtitles'),
     sendSickBeardAPICmd = require('./include/sendSickBeardAPICmd'),
     sendKodiAPICmd      = require('./include/sendKodiAPICmd'),
+    specificShow        = process.argv[2],
+    specificSeason      = process.argv[3],
     minDate             = new Date();
 
 minDate.setMonth(minDate.getMonth() - 6);
@@ -34,7 +36,7 @@ sendKodiAPICmd(
         sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
             var showName;
             for (showName in showList) {
-                if (!showList.hasOwnProperty(showName) || !kodiEpisodes[showName]) {
+                if (!showList.hasOwnProperty(showName) || !kodiEpisodes[showName] || specificShow && specificShow !== showName) {
                     continue;
                 }
 
@@ -43,7 +45,8 @@ sendKodiAPICmd(
                     sendSickBeardAPICmd('show.seasons', { tvdbid: show.tvdbid }).then(seasonList => {
                         var seasonNumber;
                         for (seasonNumber in seasonList) {
-                            if (!seasonList.hasOwnProperty(seasonNumber) || !kodiEpisodes[show.show_name][seasonNumber]) {
+                            if (!seasonList.hasOwnProperty(seasonNumber) || !kodiEpisodes[show.show_name][seasonNumber] ||
+                                typeof specificSeason !== 'undefined' && parseInt(specificSeason) !== parseInt(seasonNumber)) {
                                 continue;
                             }
 
@@ -56,7 +59,7 @@ sendKodiAPICmd(
                                 }
                                 episodeInfo = episodeList[episodeNumber];
 
-                                if (episodeInfo.location && (new Date(episodeInfo.airdate)) > minDate) {
+                                if (episodeInfo.location && (specificShow || (new Date(episodeInfo.airdate)) > minDate)) {
                                     // Check if downloaded subtitles match preferred language
                                     // ======================================================
 
