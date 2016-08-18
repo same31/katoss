@@ -4,6 +4,7 @@ var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
     config                 = require('../katoss/config.json'),
     search                 = require('../katoss/search'),
     formatShowNumber       = require('../katoss/src/utils').formatShowNumber,
+    allSettled             = require('../katoss/src/utils').allSettled,
     sendSickBeardAPICmd    = require('./include/sendSickBeardAPICmd'),
     hasToSearchEpisode,
     addEpisodeToSearch,
@@ -54,14 +55,15 @@ function notifySickBeard (tvdbid, season, episode) {
 // Get show id list
 // ----------------
 sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
-    var searchJSON = {};
+    var searchJSON  = {},
+        promiseList = [];
     for (var showName in showList) {
         if (!showList.hasOwnProperty(showName)) {
             continue;
         }
         var show = showList[showName];
         (tvdbid => {
-            sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }).then(seasonList => {
+            promiseList.push(sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }).then(seasonList => {
                 for (var seasonNumber in seasonList) {
                     if (!seasonList.hasOwnProperty(seasonNumber)) {
                         continue;
@@ -80,10 +82,13 @@ sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
                         }
                     }
                 }
-            });
+            }));
         })(show.tvdbid);
     }
-    console.log(searchJSON);
-    console.log('\n');
-    search(searchJSON, notifySickBeard);
+
+    allSettled(promiseList).then(() => {
+        console.log(searchJSON);
+        console.log('\n');
+        search(searchJSON, notifySickBeard);
+    });
 });
