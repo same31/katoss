@@ -39,22 +39,21 @@ if (hasToReplaceLowQuality) {
     };
 }
 
-function notifySickBeard (tvdbid, season, episode, callback) {
-    sendSickBeardAPICmd(
+function notifySickBeard (tvdbid, season, episode) {
+    return sendSickBeardAPICmd(
         'episode.setstatus',
         {
             'tvdbid':  tvdbid,
             'season':  parseInt(season),
             'episode': parseInt(episode),
             'status':  'skipped'
-        },
-        callback
+        }
     );
 }
 
 // Get show id list
 // ----------------
-sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, showList => {
+sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
     var searchJSON = {};
     for (var showName in showList) {
         if (!showList.hasOwnProperty(showName)) {
@@ -62,7 +61,7 @@ sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }, showList => {
         }
         var show = showList[showName];
         (tvdbid => {
-            sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }, seasonList => {
+            sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }).then(seasonList => {
                 for (var seasonNumber in seasonList) {
                     if (!seasonList.hasOwnProperty(seasonNumber)) {
                         continue;

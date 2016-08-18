@@ -24,7 +24,7 @@
   "homepage": "https://github.com/same31/katoss",
   "bugs": "https://github.com/same31/katoss/issues",
   "license": "MIT",
-  "main": "katoss/katoss.js",
+  "main": "katoss/Katoss.js",
   "dependencies": {
     "addic7ed-api": "^1.2.4",
     "bencode-js": "0.0.7",
@@ -38,7 +38,6 @@
     "rarbgto-api": "^3.0.3",
     "request": "^2.74.0",
     "request-promise-native": "^1.0.3",
-    "sync-request": "^3.0.1",
     "xmlrpc": "^1.3.2"
   },
   "devDependencies": {

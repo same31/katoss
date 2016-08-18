@@ -4,7 +4,7 @@ var Katoss     = require('./Katoss'),
     mkdirp     = require('mkdirp'),
     outputPath = config.outputPath || '.';
 
-function search (searchJSON, notifyManager) {
+module.exports = function search (searchJSON, notifyManager) {
     mkdirp(outputPath, err => {
         if (err) {
             return console.log('Cannot create directory ' + outputPath, err);
@@ -45,6 +45,4 @@ function search (searchJSON, notifyManager) {
         console.log('Queue started');
         queue.start();
     });
-}
-
-module.exports = search;
+};

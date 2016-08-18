@@ -9,7 +9,7 @@ var debugInfo  = ~process.argv.indexOf('--debug'),
     sortBy     = require('lodash.sortby'),
     outputPath = config.outputPath || '.';
 
-function Katoss (tvdbid, show, season, episode, languages, currentQuality, notifyManager) {
+module.exports = function Katoss (tvdbid, show, season, episode, languages, currentQuality, notifyManager) {
     this.handleError = error => {
         console.log(show, 'S' + season + 'E' + episode);
         console.log(error, '\n');
@@ -237,7 +237,7 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
                             fs.writeFile(torrentFilename +
                                 (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager ?
                                 () => {
-                                    notifyManager(tvdbid, season, episode, () => {
+                                    notifyManager(tvdbid, season, episode).then(() => {
                                         fs.rename(torrentFilename + '.tmp', torrentFilename);
                                         this.callback();
                                     });
@@ -258,6 +258,4 @@ function Katoss (tvdbid, show, season, episode, languages, currentQuality, notif
             .then(this.searchTorrents)
             .then(() => this.downloadMatchingTorrentAndSubtitles().catch(() => this.handleError('No match found between subtitles and torrents.')));
     };
-}
-
-module.exports = Katoss;
+};
