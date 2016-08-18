@@ -256,6 +256,6 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
 
         this.searchSubtitles()
             .then(this.searchTorrents)
-            .then(() => this.downloadMatchingTorrentAndSubtitles().catch(() => this.handleError('No match found between subtitles and torrents.')));
+            .then(() => this.downloadMatchingTorrentAndSubtitles().then(found => !found && this.handleError('No match found between subtitles and torrents.')));
     };
 };
