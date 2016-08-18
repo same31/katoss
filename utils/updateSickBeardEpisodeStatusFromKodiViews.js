@@ -51,7 +51,7 @@ sendKodiAPICmd(
                                 episodeInfo = episodeList[episodeNumber];
 
                                 if (episodeInfo.status === 'Downloaded') {
-                                    showLogged || (showLogged = true) && console.log(show.show_name);
+                                    showLogged || (showLogged = true) && console.log(showName);
                                     seasonLogged || (seasonLogged = true) && console.log(seasonNumber + ':');
                                     console.log(episodeNumber);
                                     // 'archived' status is not available in the API anymore...
