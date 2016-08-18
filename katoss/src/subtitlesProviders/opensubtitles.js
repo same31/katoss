@@ -1,7 +1,6 @@
 var config  = require('./../../config.json'),
     utils   = require('./../../src/utils'),
     fs      = require('fs'),
-    Promise = require('promise'),
     zlib    = require('zlib'),
     xmlrpc  = require('xmlrpc'),
     client  = xmlrpc.createClient({

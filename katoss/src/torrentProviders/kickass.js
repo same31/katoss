@@ -1,6 +1,5 @@
 var utils   = require('./../../src/utils'),
-    kickass = require('kickass-torrent'),
-    Promise = require('promise');
+    kickass = require('kickass-torrent');
 
 function searchEpisode (show, season, episode) {
     return new Promise((resolve, reject) => kickass(
