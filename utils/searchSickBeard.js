@@ -62,7 +62,7 @@ sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
             continue;
         }
         var show = showList[showName];
-        (tvdbid => {
+        ((tvdbid, showName) => {
             promiseList.push(sendSickBeardAPICmd('show.seasons', { tvdbid: tvdbid }).then(seasonList => {
                 for (var seasonNumber in seasonList) {
                     if (!seasonList.hasOwnProperty(seasonNumber)) {
@@ -83,7 +83,7 @@ sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
                     }
                 }
             }));
-        })(show.tvdbid);
+        })(show.tvdbid, showName);
     }
 
     allSettled(promiseList).then(() => {
