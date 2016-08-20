@@ -8,8 +8,10 @@ var config         = require('./../config.json'),
     confProviders  = (config.subtitlesProviders || ['opensubtitles']).filter(provider => ~knownProviders.indexOf(provider));
 
 function search (show, season, episode, languages) {
-    return utils.allSettled(confProviders.map(provider => providers[provider].search(show, season, episode, languages)))
-        .then(response => response.reduce(
+    return utils.allSettled(confProviders.map(provider => {
+        show === 'Marvel\'s Daredevil' && provider === 'addic7ed' && (show = 'Daredevil');
+        return providers[provider].search(show, season, episode, languages);
+    })).then(response => response.reduce(
             (prevResult, result, index) => {
                 var provider = confProviders[index];
                 return prevResult.concat((result.response || []).map(subInfo => {
