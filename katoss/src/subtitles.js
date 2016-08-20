@@ -9,17 +9,18 @@ var config         = require('./../config.json'),
 
 function search (show, season, episode, languages) {
     return utils.allSettled(confProviders.map(provider => {
+        // FIXME
         show === 'Marvel\'s Daredevil' && provider === 'addic7ed' && (show = 'Daredevil');
         return providers[provider].search(show, season, episode, languages);
     })).then(response => response.reduce(
-            (prevResult, result, index) => {
-                var provider = confProviders[index];
-                return prevResult.concat((result.response || []).map(subInfo => {
-                    subInfo.provider = provider;
-                    subInfo.team     = utils.formatRipTeam(subInfo.team);
-                    return subInfo;
-                }));
-            }, []).sort((a, b) => confProviders.indexOf(a.provider) - confProviders.indexOf(b.provider)));
+        (prevResult, result, index) => {
+            var provider = confProviders[index];
+            return prevResult.concat((result.response || []).map(subInfo => {
+                subInfo.provider = provider;
+                subInfo.team     = utils.formatRipTeam(subInfo.team);
+                return subInfo;
+            }));
+        }, []).sort((a, b) => confProviders.indexOf(a.provider) - confProviders.indexOf(b.provider)));
 }
 
 function download (subInfo, filename) {
