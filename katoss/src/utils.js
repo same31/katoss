@@ -117,7 +117,7 @@ function getReleaseQualityFromAllowed (releaseName, allowedQualityList) {
 function releaseNameIsValid (releaseName, show, season, episode) {
     show = show.trim()
         .replace(/ ?\(\d{4}\)$/g, '')
-        .replace(/([^A-Za-z0-9 &\.])/g, '$1?')
+        .replace(/([^A-Za-z0-9 &.])/g, '$1?')
         .replace(/ ?& ?/g, '.+')
         .replace(/ +/g, '.')
         .replace(/\.+/g, '.')
@@ -155,7 +155,7 @@ var queue = {
     },
     start:       function () {
         var jobs        = this.jobList.splice(0, this.concurrency);
-        this.activeJobs = this.concurrency;
+        this.activeJobs = Math.min(this.concurrency, jobs.length);
 
         jobs.forEach(job => setTimeout(() => job(this.next.bind(this)), 0));
     },
