@@ -1,4 +1,4 @@
-var utils   = require('./../../src/utils'),
+var utils   = require('../../src/utils'),
     kickass = require('kickass-torrent');
 
 function searchEpisode (show, season, episode) {

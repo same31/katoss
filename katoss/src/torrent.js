@@ -1,4 +1,4 @@
-var config         = require('./../config.json'),
+var config         = require('../config.json'),
     utils          = require('./utils'),
     requestPromise = require('request-promise-native'),
     queryString    = require('query-string'),

@@ -1,4 +1,4 @@
-var config         = require('./../config.json'),
+var config         = require('../config.json'),
     utils          = require('./utils'),
     knownProviders = ['addic7ed', 'opensubtitles'],
     providers      = {
