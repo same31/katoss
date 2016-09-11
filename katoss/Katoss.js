@@ -18,8 +18,9 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
 
     this.searchSubtitles = () => {
         return Subtitles.search(show, season, episode, languages).then(subtitleList => {
-            debugInfo && console.log('Valid subtitles name list', subtitleList);
-
+            if (debugInfo) {
+                subtitleList.forEach(sub => console.log(`[${sub.provider}][${sub.langId}][${sub.distribution}][${sub.team}]`));
+            }
             this.subtitles = {};
 
             if (subtitleList.length <= 0) {
