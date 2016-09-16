@@ -5,6 +5,7 @@ var config         = require('../config.json'),
     bencode        = require('bencode-js'),
     providers      = {
         extratorrent: require('./torrentProviders/extratorrent'),
+        isohunt:      require('./torrentProviders/isohunt'),
         kickass:      require('./torrentProviders/kickass'),
         rarbg:        require('./torrentProviders/rarbg')
     },

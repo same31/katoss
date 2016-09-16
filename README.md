@@ -8,7 +8,7 @@ It may be linked to a [Sick Beard](https://github.com/midgetspy/Sick-Beard) / [S
 
 
 KATOSS was originally an acronym for [KickAss Torrents](https://kat.cr) + [OpenSubtitles](http://http://www.opensubtitles.org) Search.
-Today, it also supports [ExtraTorrent](http://extratorrent.cc), [Rarbg torrents](https://rarbg.to) and [Addic7ed](http://www.addic7ed.com) subtitles providers.
+Today, it also supports [ExtraTorrent](http://extratorrent.cc), [isoHunt torrents](https://isohunt.to), [Rarbg torrents](https://rarbg.to) and [Addic7ed](http://www.addic7ed.com) subtitles providers.
 
 
 Requirements
@@ -46,7 +46,7 @@ See the _katoss/sampleConfig.json_ for a sample configuration file.
 
 + **subtitlesProviders**: _(optional)_ The list of supported subtitles databases, ordered by preference. Valid values are _opensubtitles_ and _addic7ed_.
 The default value is _opensubtitles_.
-+ **torrentProviders**: _(optional)_ The list of supported torrent platforms, ordered by preference. Valid values are ~~_kickass_~~, _extratorrent_ and _rarbg_.
++ **torrentProviders**: _(optional)_ The list of supported torrent platforms, ordered by preference. Valid values are ~~_kickass_~~, _extratorrent_, _isohunt_, and _rarbg_.
 The default value is _extratorrent_.
 + **openSubtitlesUserAgent**: _(optional)_ Your personal Open Subtitles user agent string, required if _opensubtitles_ is in your list of subtitles providers,
 see [How to request a new user agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).
@@ -113,6 +113,10 @@ About
 [ExtraTorrent](http://extratorrent.cc)
 
 [![ExtraTorrent logo](http://images4et.com/images/logo.gif "ExtraTorrent")](http://extratorrent.cc)
+
+[isoHunt torrents](https://isohunt.to)
+
+[![isoHunt logo](https://static.isohunt.to/img/logo_square.jpg "isoHunt torrents")](https://isohunt.to)
 
 [Rarbg torrents](https://rarbg.to)
 

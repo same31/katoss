@@ -23,6 +23,13 @@ function someSeries (list, validator) {
     });
 }
 
+function promisify (result) {
+    if (result instanceof Promise) {
+        return result;
+    }
+    return Promise.resolve(result);
+}
+
 function escapeRegExpPattern (string) {
     return string.replace(/[()<>[{\\|^$.*+?]/g, '\\$&');
 }
@@ -177,6 +184,7 @@ var queue = {
 module.exports = {
     allSettled:                   allSettled,
     someSeries:                   someSeries,
+    promisify:                    promisify,
     escapeRegExpPattern:          escapeRegExpPattern,
     getLocationOrigin:            getLocationOrigin,
     getFileExtension:             getFileExtension,

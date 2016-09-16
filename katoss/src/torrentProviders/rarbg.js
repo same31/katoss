@@ -1,5 +1,5 @@
 var utils = require('../../src/utils'),
-    rarbg = require('../../../utils/rarbgto-api.min');
+    rarbg = require('../../../lib/rarbgto-api.min.js');
 
 function searchEpisode (show, season, episode) {
     return rarbg.search(utils.formatShowTitle(show) + ' S' + season + 'E' + episode, {
@@ -15,6 +15,6 @@ function extractTorrentFilenameAndUrl (torrentInfo) {
 }
 
 module.exports = {
-    searchEpisode: searchEpisode,
+    searchEpisode:                searchEpisode,
     extractTorrentFilenameAndUrl: extractTorrentFilenameAndUrl
 };

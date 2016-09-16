@@ -1,10 +1,11 @@
 {
   "name": "katoss",
-  "version": "1.8.1",
-  "description": "KickAss Torrents + Open Subtitles Search, also supports Rarbg torrents, Extratorrent & addic7ed subtitles providers",
+  "version": "1.9.0",
+  "description": "KickAss Torrents + Open Subtitles Search, also supports Rarbg torrents, Extratorrent, isoHunt torrents & addic7ed subtitles providers",
   "keywords": [
     "kickass",
     "extratorrent",
+    "isohunt",
     "rarbg",
     "torrent",
     "opensubtitles",
@@ -30,6 +31,7 @@
     "bencode-js": "0.0.7",
     "extratorrentapi": "^1.1.0",
     "find": "0.2.4",
+    "isohunt-api": "^1.0.0",
     "kickass-torrent": "0.0.3",
     "lodash.sortby": "^4.7.0",
     "mkdirp": "^0.5.1",
