@@ -1,5 +1,5 @@
 var utils = require('../../src/utils'),
-    rarbg = require('../../../lib/rarbgto-api.min.js');
+    rarbg = require('../../../lib/rarbgto-api.min');
 
 function searchEpisode (show, season, episode) {
     return rarbg.search(utils.formatShowTitle(show) + ' S' + season + 'E' + episode, {
