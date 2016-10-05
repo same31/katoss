@@ -10,7 +10,7 @@ var config         = require('../config.json'),
 function search (show, season, episode, languages) {
     return utils.allSettled(confProviders.map(provider => {
         // FIXME
-        show === 'Marvel\'s Daredevil' && provider === 'addic7ed' && (show = 'Daredevil');
+        provider === 'addic7ed' && (show = show.replace(/^Marvel's /, ''));
         return providers[provider].search(show, season, episode, languages);
     })).then(response => response.reduce(
         (prevResult, result, index) => {
