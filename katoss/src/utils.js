@@ -58,11 +58,11 @@ function formatShowNumber (number) {
 }
 
 function getDistribution (title) {
-    var match = title.match(/HDTV|WEB.DL|WEB.?RIP|BRRIP|BDRIP|BLURAY/i);
+    var match = title.match(/\b(HDTV|BRRIP|BDRIP|BLURAY|WEB.DL|WEB.?RIP|WEB)\b/i);
     return match
         ? match[0].toUpperCase()
-        .replace(/WEB.DL|WEB.?RIP/, 'WEB-DL')
-        .replace(/BRRIP|BDRIP|BLURAY/, 'BLURAY')
+        .replace(/\b(WEB.DL|WEB.?RIP|WEB)\b/, 'WEB-DL')
+        .replace(/\b(BRRIP|BDRIP|BLURAY)\b/, 'BLURAY')
         : 'UNKNOWN';
 }
 
@@ -110,7 +110,7 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
 }
 
 function getReleaseQuality (releaseName) {
-    var matches = releaseName.match(/(2160|1080|720|480)p/i);
+    var matches = releaseName.match(/\b(2160|1080|720|480)p\b/i);
     return matches ? matches[0].toLowerCase() : 'UNKNOWN';
 }
 
@@ -149,7 +149,7 @@ function qualityIsHigherThanCurrent (foundQuality, currentQuality, allowedQualit
 }
 
 function isHEVC (title) {
-    return /(h|x).?265|HEVC/i.test(title);
+    return /\b((h|x).?265|HEVC)\b/i.test(title);
 }
 
 var queue = {
