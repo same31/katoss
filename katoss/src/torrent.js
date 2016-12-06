@@ -89,14 +89,18 @@ function getTorrentName (decodedTorrentContent) {
 }
 
 function getTorrentFiles (decodedTorrentContent) {
-    if (!decodedTorrentContent.info || !decodedTorrentContent.info.files) {
+    if (!decodedTorrentContent.info) {
         return [];
     }
+    if (!decodedTorrentContent.info.files) {
+        return decodedTorrentContent.info.length > 0 ? [decodedTorrentContent.info] : [];
+    }
+
     return decodedTorrentContent.info.files.filter(file => file.path && file.path.length > 0);
 }
 
 function getTorrentFilesFilePath (file) {
-    return file.path[file.path.length - 1].trim();
+    return typeof file.path === 'undefined' ? file.name.trim() : file.path[file.path.length - 1].trim();
 }
 
 function checkEpisodeTorrentContent (decodedTorrentContent) {
