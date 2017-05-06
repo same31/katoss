@@ -81,7 +81,7 @@ function getRipTeam (title) {
 }
 
 function formatRipTeam (ripTeam) {
-    return ripTeam.replace('0', 'O');
+    return ripTeam.replace(/0/g, 'O');
 }
 
 function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
