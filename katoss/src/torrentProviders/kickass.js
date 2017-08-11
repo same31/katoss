@@ -4,6 +4,7 @@ var utils   = require('../../src/utils'),
 function searchEpisode (show, season, episode) {
     return new Promise((resolve, reject) => kickass(
         {
+            url: 'https://kat.how',
             q:     utils.formatShowTitle(show) + ' S' + season + 'E' + episode,
             field: 'seeders',
             order: 'desc'
