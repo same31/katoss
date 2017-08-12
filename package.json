@@ -28,7 +28,7 @@
   "main": "katoss/Katoss.js",
   "dependencies": {
     "addic7ed-api": "^1.3.2",
-    "bencode-js": "0.0.7",
+    "bencode-js": "0.0.8",
     "extratorrentapi": "^1.1.1",
     "find": "0.2.4",
     "isohunt-api": "^1.1.1",
@@ -37,7 +37,7 @@
     "mkdirp": "^0.5.1",
     "query-string": "^4.2.3",
     "request": "^2.75.0",
-    "request-promise-native": "^1.0.3",
+    "request-promise-native": "^1.0.4",
     "xmlrpc": "^1.3.2"
   },
   "devDependencies": {
