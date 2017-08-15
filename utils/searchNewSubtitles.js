@@ -73,8 +73,8 @@ sendKodiAPICmd(
                                             path.resolve(episodeInfo.location.substr(0, episodeInfo.location.lastIndexOf(path.sep))),
                                             files => {
                                                 var subLangList    = files && files.length > 0
-                                                        ? files.map(file => file.match(/(..)\.srt$/)[1])
-                                                        : [],
+                                                    ? files.map(file => file.match(/(..)\.srt$/)[1])
+                                                    : [],
                                                     neededLangList = [];
 
                                                 for (var i = 0, l = languages.length; i < l; i++) {
@@ -88,10 +88,10 @@ sendKodiAPICmd(
                                                 }
 
                                                 if (neededLangList.length > 0) {
-                                                    console.log(show.show_name, seasonNumber, episodeNumber, neededLangList);
                                                     var distribution = utils.getDistribution(releaseName),
                                                         team         = utils.formatRipTeam(utils.getRipTeam(releaseName))
                                                             .replace(/^SICK(BEARD|RAGE)$/, 'UNKNOWN');
+                                                    console.log(show.show_name, seasonNumber, episodeNumber, neededLangList, distribution, team);
                                                     // Search subtitles for this release
                                                     // ---------------------------------
                                                     subtitles.search(show.show_name, seasonNumber, episodeNumber, neededLangList)
@@ -114,14 +114,14 @@ sendKodiAPICmd(
                                                                 ?
                                                                 subtitleList.some(subInfo => subInfo.distribution === distribution && downloadSubs(subInfo))
                                                                 : (
-                                                                subtitleList.some(
-                                                                    subInfo => subInfo.distribution === distribution &&
-                                                                    utils.ripTeamMatchFoundInList([subInfo.team], team) &&
-                                                                    downloadSubs(subInfo)
-                                                                )
-                                                                ||
-                                                                subtitleList.some(subInfo => utils.ripTeamMatchFoundInList([subInfo.team], team) && downloadSubs(subInfo))
-                                                            );
+                                                                    subtitleList.some(
+                                                                        subInfo => subInfo.distribution === distribution &&
+                                                                            utils.ripTeamMatchFoundInList([subInfo.team], team) &&
+                                                                            downloadSubs(subInfo)
+                                                                    )
+                                                                    ||
+                                                                    subtitleList.some(subInfo => utils.ripTeamMatchFoundInList([subInfo.team], team) && downloadSubs(subInfo))
+                                                                );
                                                         });
 
                                                 }
