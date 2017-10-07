@@ -23,9 +23,9 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
             }
             this.subtitles = {};
 
-            if (subtitleList.length <= 0) {
+            /*if (subtitleList.length <= 0) {
                 return this.handleError('No subtitles found.');
-            }
+            }*/
 
             this.subtitles = subtitleList.reduce((subs, subInfo) => {
                 var lang         = subInfo.langId,
@@ -88,25 +88,28 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                 // Check potential language matches
                 // --------------------------------
                 potentialSubLanguages = [];
-                for (lang in this.subtitles) {
-                    if (!this.subtitles.hasOwnProperty(lang)) {
-                        continue;
+                if (!torrentInfo.subtitles || torrentInfo.subtitles.length <= 0) {
+                    for (lang in this.subtitles) {
+                        if (!this.subtitles.hasOwnProperty(lang)) {
+                            continue;
+                        }
+                        if (((this.subtitles[lang][distribution] || []).concat(distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN'] || [])).length > 0) {
+                            potentialSubLanguages.push(lang);
+                        }
                     }
-                    if (((this.subtitles[lang][distribution] || []).concat(distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN'] || [])).length > 0) {
-                        potentialSubLanguages.push(lang);
+
+                    if (potentialSubLanguages.length <= 0) {
+                        debugInfo && console.log('[IGNORED TORRENT]', title, ' => cannot find a potential language match');
+                        return false;
                     }
+                    torrentInfo.subtitles = [];
                 }
-
-                if (potentialSubLanguages.length <= 0) {
-                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => cannot find a potential language match');
-                    return false;
-                }
-
-                torrentInfo.title                 = title;
-                torrentInfo.quality               = quality;
-                torrentInfo.distribution          = distribution;
-                torrentInfo.ripTeam               = utils.getRipTeam(title);
                 torrentInfo.potentialSubLanguages = potentialSubLanguages;
+
+                torrentInfo.title        = title;
+                torrentInfo.quality      = quality;
+                torrentInfo.distribution = distribution;
+                torrentInfo.ripTeam      = utils.getRipTeam(title);
 
                 return true;
             });
@@ -127,7 +130,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                 }
 
                 if (criteria === 'language') {
-                    return sortBy(torrentList, o => o.potentialSubLanguages.reduce((prevLang, lang) => Math.min(languages.indexOf(prevLang), languages.indexOf(lang))));
+                    return sortBy(torrentList, o => o.subtitles.length > 0 ? -1 : o.potentialSubLanguages.reduce((prevLang, lang) => Math.min(languages.indexOf(prevLang), languages.indexOf(lang))));
                 }
 
                 if (criteria === 'hevc') {
@@ -150,7 +153,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
 
     this.downloadMatchingTorrentAndSubtitles = () => {
         return utils.someSeries(this.torrentList, torrentInfo => utils.someSeries(languages, lang => {
-            if (!~torrentInfo.potentialSubLanguages.indexOf(lang)) {
+            if (torrentInfo.subtitles.length <= 0 && !~torrentInfo.potentialSubLanguages.indexOf(lang)) {
                 return Promise.resolve(false);
             }
 
@@ -180,39 +183,44 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         torrentRipTeam !== 'UNKNOWN' && torrentRipTeamList.push(torrentRipTeam = utils.formatRipTeam(torrentRipTeam));
                         torrentInfo.ripTeam !== 'UNKNOWN' && (torrentInfoRipTeam = utils.formatRipTeam(torrentInfo.ripTeam)) !== torrentRipTeam &&
                         torrentRipTeamList.push(torrentInfoRipTeam);
-                        if (torrentRipTeamList.length > 0) {
-                            filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
-                            if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
-                                filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
+
+                        if (torrentInfo.subtitles.length <= 0) {
+                            if (torrentRipTeamList.length > 0) {
+                                filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
+                                if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
+                                    filteredSubDistributionList = filteredSubDistributionList.concat(this.subtitles[lang]['UNKNOWN']);
+                                }
+
+                                filteredSubDistributionList = filteredSubDistributionList.filter(subInfo => {
+                                    var ripTeamList = [].concat(torrentRipTeamList);
+                                    subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
+                                    return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
+                                }).sort((a, b) => {
+                                    if (a.team === b.team) {
+                                        return 0;
+                                    }
+                                    if (a.team === 'UNKNOWN') {
+                                        return 1;
+                                    }
+                                    return -1;
+                                });
+                            }
+                            else if (torrentInfo.distribution !== 'UNKNOWN') {
+                                filteredSubDistributionList = this.subtitles[lang][torrentInfo.distribution] || [];
                             }
 
-                            filteredSubDistributionList = filteredSubDistributionList.filter(subInfo => {
-                                var ripTeamList = [].concat(torrentRipTeamList);
-                                subInfo.distribution !== 'UNKNOWN' && ripTeamList.push('UNKNOWN');
-                                return utils.ripTeamMatchFoundInList(ripTeamList, subInfo.team);
-                            }).sort((a, b) => {
-                                if (a.team === b.team) {
-                                    return 0;
-                                }
-                                if (a.team === 'UNKNOWN') {
-                                    return 1;
-                                }
-                                return -1;
-                            });
-                        }
-                        else if (torrentInfo.distribution !== 'UNKNOWN') {
-                            filteredSubDistributionList = this.subtitles[lang][torrentInfo.distribution] || [];
-                        }
+                            if (filteredSubDistributionList.length <= 0) {
+                                debugInfo && console.log(show, 'S' + season + 'E' + episode);
+                                debugInfo && console.log('"' + lang +
+                                    '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeamList.join() || 'UNKNOWN', 'team not found.');
+                                return false;
+                            }
 
-                        if (filteredSubDistributionList.length <= 0) {
-                            debugInfo && console.log(show, 'S' + season + 'E' + episode);
-                            debugInfo && console.log('"' + lang +
-                                '" subtitles for', torrentInfo.distribution, 'distribution', torrentRipTeamList.join() || 'UNKNOWN', 'team not found.');
-                            return false;
+                            subInfo = filteredSubDistributionList[0];
                         }
-
-                        subInfo = filteredSubDistributionList[0];
-
+                        else {
+                            subInfo = {};
+                        }
                         console.log(show, 'S' + season + 'E' + episode);
 
                         console.log('>>>', '[' + torrentInfo.provider + ']', torrentInfo.quality, torrentInfo.distribution, torrentRipTeam);
@@ -231,7 +239,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         // 4. Rename .torrent.tmp file to .torrent
                         // =======================================
                         ((torrentFilename, torrentContent) => {
-                            Subtitles.download(subInfo, subtitleFilename).then(() => {
+                            (torrentInfo.subtitles.length > 0 ? Promise.resolve() : Subtitles.download(subInfo, subtitleFilename)).then(() => {
                                 var hasToNotifyManager = notifyManager && tvdbid;
 
                                 fs.writeFile(torrentFilename +
