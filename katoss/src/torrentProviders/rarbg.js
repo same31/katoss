@@ -3,11 +3,12 @@ var utils = require('../../src/utils'),
 
 function searchEpisode (show, season, episode) {
     return rarbg.search(utils.formatShowTitle(show) + ' S' + season + 'E' + episode, {
-        category: 'tv',
-        order:    'seeders',
-        by:       'DESC',
-        page:     1
-    });
+        category:          'tv',
+        order:             'seeders',
+        by:                'DESC',
+        page:              1,
+        retrieveSubtitles: true
+    }).then(response => response.results);
 }
 
 function extractTorrentFilenameAndUrl (torrentInfo) {
