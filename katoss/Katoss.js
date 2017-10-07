@@ -153,7 +153,8 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
 
     this.downloadMatchingTorrentAndSubtitles = () => {
         return utils.someSeries(this.torrentList, torrentInfo => utils.someSeries(languages, lang => {
-            if (torrentInfo.subtitles.length <= 0 && !~torrentInfo.potentialSubLanguages.indexOf(lang)) {
+            var torrentHasSubtitlesIncluded = torrentInfo.subtitles.length > 0;
+            if (!torrentHasSubtitlesIncluded && !~torrentInfo.potentialSubLanguages.indexOf(lang)) {
                 return Promise.resolve(false);
             }
 
@@ -184,7 +185,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         torrentInfo.ripTeam !== 'UNKNOWN' && (torrentInfoRipTeam = utils.formatRipTeam(torrentInfo.ripTeam)) !== torrentRipTeam &&
                         torrentRipTeamList.push(torrentInfoRipTeam);
 
-                        if (torrentInfo.subtitles.length <= 0) {
+                        if (!torrentHasSubtitlesIncluded) {
                             if (torrentRipTeamList.length > 0) {
                                 filteredSubDistributionList = (this.subtitles[lang][torrentInfo.distribution] || []);
                                 if (torrentInfo.distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN']) {
@@ -224,14 +225,18 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         console.log(show, 'S' + season + 'E' + episode);
 
                         console.log('>>>', '[' + torrentInfo.provider + ']', torrentInfo.quality, torrentInfo.distribution, torrentRipTeam);
-                        console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
+                        torrentHasSubtitlesIncluded || console.log('   ', '[' + subInfo.provider + ']', lang, subInfo.distribution, subInfo.team);
                         console.log(' Torrent:', torrentInfo.title.trim());
                         console.log(' Episode filename:', episodeFilename.trim());
-                        console.log(' Sub: %s\n', subInfo.SubFileName &&
-                            subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version);
+                        console.log((torrentHasSubtitlesIncluded
+                            ? ' Included subs: ' + torrentInfo.subtitles.join(', ')
+                            : ' Sub: ' + subInfo.SubFileName &&
+                            subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version) + '\n');
 
-                        subtitleFilename = path.join(outputPath,
-                            episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
+                        if (!torrentHasSubtitlesIncluded) {
+                            subtitleFilename = path.join(outputPath,
+                                episodeFilename.substr(0, episodeFilename.lastIndexOf('.') + 1) + lang.substr(0, 2) + '.srt');
+                        }
 
                         // 1. Download & write subtitles file
                         // 2. Write torrent file (.torrent.tmp)
@@ -239,7 +244,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         // 4. Rename .torrent.tmp file to .torrent
                         // =======================================
                         ((torrentFilename, torrentContent) => {
-                            (torrentInfo.subtitles.length > 0 ? Promise.resolve() : Subtitles.download(subInfo, subtitleFilename)).then(() => {
+                            (torrentHasSubtitlesIncluded ? Promise.resolve() : Subtitles.download(subInfo, subtitleFilename)).then(() => {
                                 var hasToNotifyManager = notifyManager && tvdbid;
 
                                 fs.writeFile(torrentFilename +
