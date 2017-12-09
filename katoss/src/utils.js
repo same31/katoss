@@ -130,7 +130,7 @@ function releaseNameIsValid (releaseName, show, season, episode) {
         .replace(/\.+/g, '.')
         .replace(/\.$/, '');
 
-    var reg = new RegExp('^' + show + '.+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
+    var reg = new RegExp('^' + show + '[^A-Za-z]+(S' + season + 'E' + episode + '|' + season + 'x' + episode + '|' +
         parseInt(season) + 'x' + episode + '|' + season + 'x' + parseInt(episode) + '|' +
         parseInt(season) + 'x' + parseInt(episode) + ')', 'i');
     return reg.test(releaseName.trim());
