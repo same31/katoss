@@ -88,7 +88,18 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                 // Check potential language matches
                 // --------------------------------
                 potentialSubLanguages = [];
-                if (!torrentInfo.subtitles || torrentInfo.subtitles.length <= 0) {
+               
+			    if (torrentInfo.subtitles && torrentInfo.subtitles.length > 0) {
+					for (langFound in torrentInfo.subtitles) {
+                        if (!torrentInfo.subtitles.hasOwnProperty(langFound)) {
+                            continue;
+                        }
+						const lang = langFound.substr(0, 3).toLowerCase(); // FIXME
+                        potentialSubLanguages.push(lang);
+                    }
+				}
+				
+			//	if (!torrentInfo.subtitles || torrentInfo.subtitles.length <= 0) {
                     for (lang in this.subtitles) {
                         if (!this.subtitles.hasOwnProperty(lang)) {
                             continue;
@@ -98,11 +109,12 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         }
                     }
 
-                    if (potentialSubLanguages.length <= 0) {
-                        debugInfo && console.log('[IGNORED TORRENT]', title, ' => cannot find a potential language match');
-                        return false;
-                    }
+                    
                     torrentInfo.subtitles = [];
+             //   }
+			    if (potentialSubLanguages.length <= 0) {
+                    debugInfo && console.log('[IGNORED TORRENT]', title, ' => cannot find a potential language match');
+                    return false;
                 }
                 torrentInfo.potentialSubLanguages = potentialSubLanguages;
 
@@ -153,7 +165,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
 
     this.downloadMatchingTorrentAndSubtitles = () => {
         return utils.someSeries(this.torrentList, torrentInfo => utils.someSeries(languages, lang => {
-            var torrentHasSubtitlesIncluded = torrentInfo.subtitles.length > 0;
+            var torrentHasSubtitlesIncluded = torrentInfo.subtitles.length > 0 && torrentInfo.subtitles.some(subLang => subLang.substr(0, 3).toLowerCase() === lang);
             if (!torrentHasSubtitlesIncluded && !~torrentInfo.potentialSubLanguages.indexOf(lang)) {
                 return Promise.resolve(false);
             }
