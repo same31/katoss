@@ -88,30 +88,23 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                 // Check potential language matches
                 // --------------------------------
                 potentialSubLanguages = [];
-               
-			    if (torrentInfo.subtitles && torrentInfo.subtitles.length > 0) {
-					for (langFound in torrentInfo.subtitles) {
-                        if (!torrentInfo.subtitles.hasOwnProperty(langFound)) {
-                            continue;
-                        }
+                torrentInfo.subtitles || (torrentInfo.subtitles = []);
+			    if (torrentInfo.subtitles.length > 0) {
+					torrentInfo.subtitles.forEach(langFound => {
 						const lang = langFound.substr(0, 3).toLowerCase(); // FIXME
-                        potentialSubLanguages.push(lang);
-                    }
+						potentialSubLanguages.push(lang);
+					});
 				}
 				
-			//	if (!torrentInfo.subtitles || torrentInfo.subtitles.length <= 0) {
-                    for (lang in this.subtitles) {
-                        if (!this.subtitles.hasOwnProperty(lang)) {
-                            continue;
-                        }
-                        if (((this.subtitles[lang][distribution] || []).concat(distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN'] || [])).length > 0) {
-                            potentialSubLanguages.push(lang);
-                        }
-                    }
+				for (lang in this.subtitles) {
+					if (!this.subtitles.hasOwnProperty(lang)) {
+						continue;
+					}
+					if (((this.subtitles[lang][distribution] || []).concat(distribution !== 'UNKNOWN' && this.subtitles[lang]['UNKNOWN'] || [])).length > 0) {
+						potentialSubLanguages.push(lang);
+					}
+				}
 
-                    
-                    torrentInfo.subtitles = [];
-             //   }
 			    if (potentialSubLanguages.length <= 0) {
                     debugInfo && console.log('[IGNORED TORRENT]', title, ' => cannot find a potential language match');
                     return false;
