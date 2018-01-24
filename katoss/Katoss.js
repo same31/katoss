@@ -235,8 +235,8 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                         console.log(' Episode filename:', episodeFilename.trim());
                         console.log((torrentHasSubtitlesIncluded
                             ? ' Included subs: ' + torrentInfo.subtitles.join(', ')
-                            : ' Sub: ' + subInfo.SubFileName &&
-                            subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version) + '\n');
+                            : ' Sub: ' + (subInfo.SubFileName &&
+                            subInfo.SubFileName.trim() + ' [' + subInfo.MovieReleaseName.trim() + ']' || subInfo.version)) + '\n');
 
                         if (!torrentHasSubtitlesIncluded) {
                             subtitleFilename = path.join(outputPath,
