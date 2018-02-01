@@ -9,7 +9,9 @@ var movieDest             = process.argv[2],
     outputPath            = config.outputPath || '.',
     subSrcBase            = movieSrc.substring(movieSrc.lastIndexOf('/') + 1, movieSrc.lastIndexOf('.'));
 
-find.file(new RegExp('^' + utils.escapeRegExpPattern(subSrcBase) + '.*\.srt$'), path.resolve(outputPath), files => {
+console.log('Katoss SickRage post processing. \nMovie src: \'%s\'\nSub src base: \'%s\'', movieSrc, subSrcBase);
+
+find.file(new RegExp('[\\\/]' + utils.escapeRegExpPattern(subSrcBase) + '.*\.srt$'), path.resolve(outputPath), files => {
     if (!files || files.length <= 0) {
         return console.log('No subtitle found. \nMovie src: \'%s\'\nSub src base: \'%s\'', movieSrc, subSrcBase);
     }

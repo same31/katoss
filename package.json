@@ -30,7 +30,7 @@
     "addic7ed-api": "^1.3.2",
     "bencode-js": "0.0.8",
     "extratorrentapi": "^1.1.1",
-    "find": "0.2.4",
+    "find": "0.2.9",
     "isohunt-api": "^1.1.1",
     "kickass-torrent": "0.0.3",
     "lodash.sortby": "^4.7.0",
