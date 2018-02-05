@@ -20,5 +20,36 @@ find.file(new RegExp('[\\\/]' + utils.escapeRegExpPattern(subSrcBase) + '.*\.srt
         subDest = movieDest.substr(0, movieDest.lastIndexOf('.')) + subExt;
 
     console.log('Move subtitles file from', subSrc, 'to', subDest);
-    fs.rename(subSrc, subDest, config.kodi && cleanKodiVideoLibrary);
+    // Triggers EXDEV error : fs.rename(subSrc, subDest, config.kodi && cleanKodiVideoLibrary);
+
+    // Read the file
+	fs.readFile(subSrc, function (err, data) {
+		if (err) {
+			throw err;
+		}
+		console.log('sub src file read!');
+
+		// Write the file
+		fs.writeFile(subDest, data, function (err) {
+			if (err) {
+				throw err;
+			}
+			res.write('sub dest file uploaded and moved!');
+			res.end();
+			console.log('sub dest file written!');
+
+			if (config.kodi) {
+				cleanKodiVideoLibrary();
+			}
+
+			// Delete the file
+			fs.unlink(subSrc, function (err) {
+				if (err) {
+					throw err;
+				}
+				console.log('sub src file deleted!');
+			});
+		});
+
+	});	
 });
