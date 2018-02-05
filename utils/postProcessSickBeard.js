@@ -34,8 +34,6 @@ find.file(new RegExp('[\\\/]' + utils.escapeRegExpPattern(subSrcBase) + '.*\.srt
 			if (err) {
 				throw err;
 			}
-			res.write('sub dest file uploaded and moved!');
-			res.end();
 			console.log('sub dest file written!');
 
 			if (config.kodi) {
