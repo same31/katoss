@@ -50,4 +50,9 @@ find.file(new RegExp('[\\\/]' + utils.escapeRegExpPattern(subSrcBase) + '.*\.srt
 		});
 
 	});	
+})
+.error(err => {
+	if (err) {
+		console.log(err);
+	}
 });
