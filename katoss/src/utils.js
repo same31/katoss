@@ -87,8 +87,9 @@ function formatRipTeam (ripTeam) {
 function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
     var sameTeamList = [
         ['DIMENSION', 'LOL', 'SYS', 'BAJSKORV'],
-        ['ASAP', 'XII', 'IMMERSE', 'FLEET', 'AVS', 'SVA', 'AVSSVA', 'AVS_SVA', 'AVS/SVA', 'SKGTV'],
-        ['FQM', 'ORENJI']
+        ['ASAP', 'XII', 'IMMERSE', 'FLEET', 'AVS', 'SVA', 'AVSSVA', 'AVS_SVA', 'AVS/SVA', 'SKGTV', 'RBB', 'RMTEAM', 'AFG', 'PSA'],
+        ['FQM', 'ORENJI'],
+		['VISUM', 'ION1O', 'VISUMION1O', 'BAMBOOZLE', 'CONVOY']
     ];
     return ripTeamList.some(ripTeam => {
         if (ripTeam === searchedRipTeam) {
