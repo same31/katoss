@@ -7,6 +7,7 @@ var path                = require('path'),
     sendKodiAPICmd      = require('./include/sendKodiAPICmd'),
     specificShow        = process.argv[2],
     specificSeason      = process.argv[3],
+	lazy				= ~process.argv.indexOf('--lazy');
     minDate             = new Date();
 
 minDate.setMonth(minDate.getMonth() - 6);
@@ -99,7 +100,6 @@ sendKodiAPICmd(
                                                             subtitleList = subtitleList.sort(
                                                                 (a, b) => neededLangList.indexOf(a.langId) - neededLangList.indexOf(b.langId)
                                                             );
-
                                                             function downloadSubs (subInfo) {
                                                                 subtitles.download(
                                                                     subInfo,
@@ -121,6 +121,8 @@ sendKodiAPICmd(
                                                                     )
                                                                     ||
                                                                     subtitleList.some(subInfo => utils.ripTeamMatchFoundInList([subInfo.team], team) && downloadSubs(subInfo))
+                                                                    ||
+																	lazy && subtitleList.some(subInfo => subInfo.distribution === distribution && downloadSubs(subInfo))
                                                                 );
                                                         });
 
