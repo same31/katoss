@@ -84,10 +84,17 @@ function formatRipTeam (ripTeam) {
     return ripTeam.replace(/0/g, 'O');
 }
 
+function isTeamInPatternList (team, patternList) {
+	return patternList.some(pattern => typeof pattern === 'string'
+		? pattern === team
+		: pattern.test(team)
+	);
+}
+
 function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
     var sameTeamList = [
         ['DIMENSION', 'LOL', 'SYS', 'BAJSKORV'],
-        ['ASAP', 'XII', 'IMMERSE', 'FLEET', 'AVS', 'SVA', 'AVSSVA', 'AVS_SVA', 'AVS/SVA', 'AVS-SVA', 'SVAAVS', 'SVA_AVS', 'SVA/AVS', 'SVA-AVS', 'SKGTV', 'RBB', 'RMTEAM', 'AFG', 'PSA'],
+        ['ASAP', 'XII', 'IMMERSE', 'FLEET', /^(AVS|SVA)?(AVS.?SVA)?(SVA.?AVS)?$/, 'SKGTV', 'RBB', 'RMTEAM', 'AFG', 'PSA'],
         ['FQM', 'ORENJI'],
 		['VISUM', 'ION1O', 'VISUMION1O', 'BAMBOOZLE', 'CONVOY', 'CASSTUDIO']
     ];
@@ -101,9 +108,9 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
             sameTeams;
         for (; i < l; i++) {
             sameTeams = sameTeamList[i];
-            if (~sameTeams.indexOf(ripTeam)) {
-                return ~sameTeams.indexOf(searchedRipTeam);
-            }
+			if (isTeamInPatternList (ripTeam, sameTeams)) {
+				return isTeamInPatternList(searchedRipTeam, sameTeams);
+			}
         }
 
         return false;
