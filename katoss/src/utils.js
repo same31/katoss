@@ -61,8 +61,8 @@ function getDistribution (title) {
     var match = title.match(/\b(HDTV|BRRIP|BDRIP|BLURAY|WEB.DL|WEB.?RIP|WEB)\b/i);
     return match
         ? match[0].toUpperCase()
-        .replace(/\b(WEB.DL|WEB.?RIP|WEB)\b/, 'WEB-DL')
-        .replace(/\b(BRRIP|BDRIP|BLURAY)\b/, 'BLURAY')
+            .replace(/\b(WEB.DL|WEB.?RIP|WEB)\b/, 'WEB-DL')
+            .replace(/\b(BRRIP|BDRIP|BLURAY)\b/, 'BLURAY')
         : 'UNKNOWN';
 }
 
@@ -85,10 +85,10 @@ function formatRipTeam (ripTeam) {
 }
 
 function isTeamInPatternList (team, patternList) {
-	return patternList.some(pattern => typeof pattern === 'string'
-		? pattern === team
-		: pattern.test(team)
-	);
+    return patternList.some(pattern => typeof pattern === 'string'
+        ? pattern === team
+        : pattern.test(team)
+    );
 }
 
 function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
@@ -96,7 +96,7 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
         ['DIMENSION', 'LOL', 'SYS', 'BAJSKORV'],
         ['ASAP', 'XII', 'IMMERSE', 'FLEET', /^(AVS|SVA)?(AVS.?SVA)?(SVA.?AVS)?$/, 'SKGTV', 'RBB', 'RMTEAM', 'AFG', 'PSA'],
         ['FQM', 'ORENJI'],
-		['VISUM', 'ION1O', 'VISUMION1O', 'BAMBOOZLE', 'CONVOY', 'CASSTUDIO']
+        ['VISUM', 'ION1O', 'VISUMION1O', 'BAMBOOZLE', 'CONVOY', 'CASSTUDIO']
     ];
     return ripTeamList.some(ripTeam => {
         if (ripTeam === searchedRipTeam) {
@@ -108,9 +108,9 @@ function ripTeamMatchFoundInList (ripTeamList, searchedRipTeam) {
             sameTeams;
         for (; i < l; i++) {
             sameTeams = sameTeamList[i];
-			if (isTeamInPatternList (ripTeam, sameTeams)) {
-				return isTeamInPatternList(searchedRipTeam, sameTeams);
-			}
+            if (isTeamInPatternList(ripTeam, sameTeams)) {
+                return isTeamInPatternList(searchedRipTeam, sameTeams);
+            }
         }
 
         return false;
