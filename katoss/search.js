@@ -31,7 +31,7 @@ module.exports = function search (searchJSON, notifyManager) {
                     continue;
                 }
 
-                episodeList        = showInfo.seasons[season];
+                episodeList        = flattenEpisodeList(showInfo.seasons[season]);
                 currentQualityList = showInfo.currentQualities && showInfo.currentQualities[season];
                 episodeList.forEach((episode, index) => {
                     var currentQuality = currentQualityList && currentQualityList[index],
@@ -46,3 +46,19 @@ module.exports = function search (searchJSON, notifyManager) {
         queue.start();
     });
 };
+
+function flattenEpisodeList (episodeList) {
+    return episodeList.reduce((episodeList, episodeRange) => {
+        episodeRange     = episodeRange.toString().split('-').map(episodeNumber => parseInt(episodeNumber, 10));
+        const rangeStart = episodeRange[0];
+        const rangeEnd   = episodeRange[episodeRange.length - 1];
+        episodeRange     = Array
+            .apply(null, { length: rangeEnd - rangeStart + 1 })
+            .map((value, index) => {
+                const episodeNumber = index + rangeStart;
+                const episodeNumberString = episodeNumber.toString();
+                return episodeNumber < 10 ? '0' + episodeNumberString : episodeNumberString;
+            });
+        return episodeList.concat(episodeRange);
+    }, []);
+}
