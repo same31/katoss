@@ -256,7 +256,11 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
                                     (hasToNotifyManager ? '.tmp' : ''), torrentContent, 'binary', hasToNotifyManager ?
                                     () => {
                                         notifyManager(tvdbid, season, episode).then(() => {
-                                            fs.rename(torrentFilename + '.tmp', torrentFilename);
+                                            fs.rename(torrentFilename + '.tmp', torrentFilename, err => {
+                                                if (err) {
+                                                    console.error(err);
+                                                }
+                                            });
                                             this.callback();
                                         });
                                     } : this.callback);
