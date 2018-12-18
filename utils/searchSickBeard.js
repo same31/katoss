@@ -6,6 +6,7 @@ var hasToReplaceLowQuality = ~process.argv.indexOf('--replace-low-quality'),
     formatShowNumber       = require('../katoss/src/utils').formatShowNumber,
     allSettled             = require('../katoss/src/utils').allSettled,
     sendSickBeardAPICmd    = require('./include/sendSickBeardAPICmd'),
+	showAlternativeTitles  = require('../katoss/showAlternativeTitles.json'),
     hasToSearchEpisode,
     addEpisodeToSearch,
     maxQuality,
@@ -83,7 +84,7 @@ sendSickBeardAPICmd('shows', { 'sort': 'name', 'paused': 0 }).then(showList => {
                     }
                 }
             }));
-        })(show.tvdbid, showName);
+        })(show.tvdbid, showAlternativeTitles[showName] || showName);
     }
 
     allSettled(promiseList).then(() => {
