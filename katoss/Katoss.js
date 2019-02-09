@@ -164,7 +164,7 @@ module.exports = function Katoss (tvdbid, show, season, episode, languages, curr
             }
 
             return utils.promisify(Torrent.extractTorrentFilenameAndUrl(torrentInfo)).then(torrentFile => {
-                return Torrent.downloadTorrentFileContent(torrentFile.url).then(torrentContent => {
+                return Torrent.downloadTorrentFileContent(torrentFile.url, torrentInfo).then(torrentContent => {
                     var decodedTorrentContent,
                         filteredSubDistributionList = [],
                         episodeFilename,

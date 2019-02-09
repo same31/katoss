@@ -36,8 +36,13 @@ function extractTorrentFilenameAndUrl (torrentInfo) {
     return provider.extractTorrentFilenameAndUrl(torrentInfo);
 }
 
-function downloadTorrentFileContent (url) {
+function downloadTorrentFileContent (url, torrentInfo) {
     url         = url.trim();
+    var provider = torrentInfo && torrentInfo.provider && providers[torrentInfo.provider];
+    if (provider && provider.downloadTorrentFileContent) {
+        return provider.downloadTorrentFileContent(url);
+    }
+
     var qs      = queryString.extract(url),
         options = {
             headers:                 {

@@ -15,7 +15,12 @@ function extractTorrentFilenameAndUrl (torrentInfo) {
     return torrentInfo;
 }
 
+function downloadTorrentFileContent (url) {
+    return rarbg.download(url);
+}
+
 module.exports = {
+    downloadTorrentFileContent: downloadTorrentFileContent,
     searchEpisode:                searchEpisode,
     extractTorrentFilenameAndUrl: extractTorrentFilenameAndUrl
 };
